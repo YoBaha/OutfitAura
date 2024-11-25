@@ -23,9 +23,9 @@ interface AuthService {
     @POST("user/register")
     fun register(@Body request: SignUpRequest): Call<SignUpResponse>
 
-    // Modified to accept the email directly, no need for ForgotPasswordRequest
+
     @POST("user/forgot-password")
-    fun forgotPassword(@Body email: String): Call<String> // Accepts email as a simple string
+    fun forgotPassword(@Body email: String): Call<String>
 
     @POST("user/reset-password")
     fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>

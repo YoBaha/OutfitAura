@@ -26,7 +26,7 @@
     import androidx.compose.ui.res.painterResource
     import tn.esprit.outfitaura2.models.LoginRequest
     import tn.esprit.outfitaura2.models.LoginResponse
-    import tn.esprit.outfitaura2.ui.theme.WhiteColor // Import the custom white color
+    import tn.esprit.outfitaura2.ui.theme.WhiteColor
     import tn.esprit.outfitaura2.viewmodels.HomeActivity
 
     class LoginActivity : ComponentActivity() {
@@ -109,7 +109,7 @@
             modifier = Modifier.fillMaxSize()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bg2),
+                painter = painterResource(id = R.drawable.bg3),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -127,7 +127,7 @@
                 Image(
                     painter = painterResource(id = R.drawable.a),
                     contentDescription = "App Logo",
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier.size(240.dp)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

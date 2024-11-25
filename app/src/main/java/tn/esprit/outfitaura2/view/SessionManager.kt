@@ -1,6 +1,7 @@
-package tn.esprit.outfitaura2.network
+package tn.esprit.outfitaura2.view
 
 import android.content.Context
+import tn.esprit.outfitaura2.network.User
 
 class SessionManager(context: Context) {
     private val sharedPref = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
