@@ -1,0 +1,702 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		55DD87452CF8A1F9003C1755 /* UIImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DD87442CF8A1F9003C1755 /* UIImagePickerController.swift */; };
+		55ED44FE2CF5F9C000FA6407 /* OutfitAura2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED44FD2CF5F9C000FA6407 /* OutfitAura2App.swift */; };
+		55ED45002CF5F9C000FA6407 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED44FF2CF5F9C000FA6407 /* ContentView.swift */; };
+		55ED45022CF5F9C100FA6407 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 55ED45012CF5F9C100FA6407 /* Assets.xcassets */; };
+		55ED45052CF5F9C100FA6407 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 55ED45042CF5F9C100FA6407 /* Preview Assets.xcassets */; };
+		55ED450F2CF5F9C100FA6407 /* OutfitAura2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED450E2CF5F9C100FA6407 /* OutfitAura2Tests.swift */; };
+		55ED45192CF5F9C100FA6407 /* OutfitAura2UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45182CF5F9C100FA6407 /* OutfitAura2UITests.swift */; };
+		55ED451B2CF5F9C100FA6407 /* OutfitAura2UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED451A2CF5F9C100FA6407 /* OutfitAura2UITestsLaunchTests.swift */; };
+		55ED45282CF5F9DF00FA6407 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45272CF5F9DF00FA6407 /* LoginView.swift */; };
+		55ED452A2CF5F9F500FA6407 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45292CF5F9F500FA6407 /* SignUpView.swift */; };
+		55ED452C2CF5FA0E00FA6407 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED452B2CF5FA0E00FA6407 /* AuthService.swift */; };
+		55ED452E2CF5FA1A00FA6407 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED452D2CF5FA1A00FA6407 /* User.swift */; };
+		55ED45302CF5FA2D00FA6407 /* SignUpResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED452F2CF5FA2D00FA6407 /* SignUpResponse.swift */; };
+		55ED45322CF5FA4400FA6407 /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45312CF5FA4400FA6407 /* LoginResponse.swift */; };
+		55ED45342CF5FA5800FA6407 /* LoginRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45332CF5FA5800FA6407 /* LoginRequest.swift */; };
+		55ED45362CF5FA7900FA6407 /* SignUpRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45352CF5FA7900FA6407 /* SignUpRequest.swift */; };
+		55ED45382CF5FA9C00FA6407 /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45372CF5FA9C00FA6407 /* HomePageView.swift */; };
+		55ED453A2CF5FAB000FA6407 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45392CF5FAB000FA6407 /* CameraView.swift */; };
+		55ED453C2CF5FAD400FA6407 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED453B2CF5FAD400FA6407 /* ForgotPasswordView.swift */; };
+		55ED453E2CF5FAE700FA6407 /* ResetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED453D2CF5FAE700FA6407 /* ResetPasswordView.swift */; };
+		55ED45402CF5FB0800FA6407 /* ResetPasswordRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED453F2CF5FB0800FA6407 /* ResetPasswordRequest.swift */; };
+		55ED45422CF5FB1A00FA6407 /* ResetPasswordResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45412CF5FB1A00FA6407 /* ResetPasswordResponse.swift */; };
+		55ED45442CF5FB3500FA6407 /* ForgotPasswordRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45432CF5FB3500FA6407 /* ForgotPasswordRequest.swift */; };
+		55ED45462CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55ED45452CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist */; };
+		55ED45492CF60E7E00FA6407 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 55ED45482CF60E7E00FA6407 /* GoogleSignIn */; };
+		55ED454B2CF60E7E00FA6407 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 55ED454A2CF60E7E00FA6407 /* GoogleSignInSwift */; };
+		55ED454D2CF6130200FA6407 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED454C2CF6130200FA6407 /* AppDelegate.swift */; };
+		55ED454F2CF6133B00FA6407 /* GoogleSignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED454E2CF6133B00FA6407 /* GoogleSignInViewModel.swift */; };
+		55ED45512CF6205B00FA6407 /* info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55ED45502CF6205B00FA6407 /* info.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		55ED450B2CF5F9C100FA6407 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 55ED44F22CF5F9C000FA6407 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55ED44F92CF5F9C000FA6407;
+			remoteInfo = OutfitAura2;
+		};
+		55ED45152CF5F9C100FA6407 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 55ED44F22CF5F9C000FA6407 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55ED44F92CF5F9C000FA6407;
+			remoteInfo = OutfitAura2;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		55DD87442CF8A1F9003C1755 /* UIImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImagePickerController.swift; sourceTree = "<group>"; };
+		55ED44FA2CF5F9C000FA6407 /* OutfitAura2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutfitAura2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55ED44FD2CF5F9C000FA6407 /* OutfitAura2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutfitAura2App.swift; sourceTree = "<group>"; };
+		55ED44FF2CF5F9C000FA6407 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		55ED45012CF5F9C100FA6407 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		55ED45042CF5F9C100FA6407 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		55ED450A2CF5F9C100FA6407 /* OutfitAura2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OutfitAura2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		55ED450E2CF5F9C100FA6407 /* OutfitAura2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutfitAura2Tests.swift; sourceTree = "<group>"; };
+		55ED45142CF5F9C100FA6407 /* OutfitAura2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OutfitAura2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		55ED45182CF5F9C100FA6407 /* OutfitAura2UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutfitAura2UITests.swift; sourceTree = "<group>"; };
+		55ED451A2CF5F9C100FA6407 /* OutfitAura2UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutfitAura2UITestsLaunchTests.swift; sourceTree = "<group>"; };
+		55ED45272CF5F9DF00FA6407 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		55ED45292CF5F9F500FA6407 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		55ED452B2CF5FA0E00FA6407 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		55ED452D2CF5FA1A00FA6407 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		55ED452F2CF5FA2D00FA6407 /* SignUpResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpResponse.swift; sourceTree = "<group>"; };
+		55ED45312CF5FA4400FA6407 /* LoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
+		55ED45332CF5FA5800FA6407 /* LoginRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRequest.swift; sourceTree = "<group>"; };
+		55ED45352CF5FA7900FA6407 /* SignUpRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpRequest.swift; sourceTree = "<group>"; };
+		55ED45372CF5FA9C00FA6407 /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
+		55ED45392CF5FAB000FA6407 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		55ED453B2CF5FAD400FA6407 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
+		55ED453D2CF5FAE700FA6407 /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
+		55ED453F2CF5FB0800FA6407 /* ResetPasswordRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordRequest.swift; sourceTree = "<group>"; };
+		55ED45412CF5FB1A00FA6407 /* ResetPasswordResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordResponse.swift; sourceTree = "<group>"; };
+		55ED45432CF5FB3500FA6407 /* ForgotPasswordRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordRequest.swift; sourceTree = "<group>"; };
+		55ED45452CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist"; sourceTree = "<group>"; };
+		55ED454C2CF6130200FA6407 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		55ED454E2CF6133B00FA6407 /* GoogleSignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInViewModel.swift; sourceTree = "<group>"; };
+		55ED45502CF6205B00FA6407 /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		55ED44F72CF5F9C000FA6407 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55ED45492CF60E7E00FA6407 /* GoogleSignIn in Frameworks */,
+				55ED454B2CF60E7E00FA6407 /* GoogleSignInSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55ED45072CF5F9C100FA6407 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55ED45112CF5F9C100FA6407 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		55ED44F12CF5F9C000FA6407 = {
+			isa = PBXGroup;
+			children = (
+				55ED44FC2CF5F9C000FA6407 /* OutfitAura2 */,
+				55ED450D2CF5F9C100FA6407 /* OutfitAura2Tests */,
+				55ED45172CF5F9C100FA6407 /* OutfitAura2UITests */,
+				55ED44FB2CF5F9C000FA6407 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		55ED44FB2CF5F9C000FA6407 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				55ED44FA2CF5F9C000FA6407 /* OutfitAura2.app */,
+				55ED450A2CF5F9C100FA6407 /* OutfitAura2Tests.xctest */,
+				55ED45142CF5F9C100FA6407 /* OutfitAura2UITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		55ED44FC2CF5F9C000FA6407 /* OutfitAura2 */ = {
+			isa = PBXGroup;
+			children = (
+				55ED45452CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist */,
+				55ED44FD2CF5F9C000FA6407 /* OutfitAura2App.swift */,
+				55ED44FF2CF5F9C000FA6407 /* ContentView.swift */,
+				55ED45012CF5F9C100FA6407 /* Assets.xcassets */,
+				55ED45032CF5F9C100FA6407 /* Preview Content */,
+				55ED45272CF5F9DF00FA6407 /* LoginView.swift */,
+				55ED45292CF5F9F500FA6407 /* SignUpView.swift */,
+				55ED452B2CF5FA0E00FA6407 /* AuthService.swift */,
+				55ED452D2CF5FA1A00FA6407 /* User.swift */,
+				55ED452F2CF5FA2D00FA6407 /* SignUpResponse.swift */,
+				55ED45312CF5FA4400FA6407 /* LoginResponse.swift */,
+				55ED45332CF5FA5800FA6407 /* LoginRequest.swift */,
+				55ED45352CF5FA7900FA6407 /* SignUpRequest.swift */,
+				55ED45372CF5FA9C00FA6407 /* HomePageView.swift */,
+				55ED45392CF5FAB000FA6407 /* CameraView.swift */,
+				55ED453B2CF5FAD400FA6407 /* ForgotPasswordView.swift */,
+				55ED453D2CF5FAE700FA6407 /* ResetPasswordView.swift */,
+				55ED453F2CF5FB0800FA6407 /* ResetPasswordRequest.swift */,
+				55ED45412CF5FB1A00FA6407 /* ResetPasswordResponse.swift */,
+				55ED45432CF5FB3500FA6407 /* ForgotPasswordRequest.swift */,
+				55ED454C2CF6130200FA6407 /* AppDelegate.swift */,
+				55ED454E2CF6133B00FA6407 /* GoogleSignInViewModel.swift */,
+				55ED45502CF6205B00FA6407 /* info.plist */,
+				55DD87442CF8A1F9003C1755 /* UIImagePickerController.swift */,
+			);
+			path = OutfitAura2;
+			sourceTree = "<group>";
+		};
+		55ED45032CF5F9C100FA6407 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				55ED45042CF5F9C100FA6407 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		55ED450D2CF5F9C100FA6407 /* OutfitAura2Tests */ = {
+			isa = PBXGroup;
+			children = (
+				55ED450E2CF5F9C100FA6407 /* OutfitAura2Tests.swift */,
+			);
+			path = OutfitAura2Tests;
+			sourceTree = "<group>";
+		};
+		55ED45172CF5F9C100FA6407 /* OutfitAura2UITests */ = {
+			isa = PBXGroup;
+			children = (
+				55ED45182CF5F9C100FA6407 /* OutfitAura2UITests.swift */,
+				55ED451A2CF5F9C100FA6407 /* OutfitAura2UITestsLaunchTests.swift */,
+			);
+			path = OutfitAura2UITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		55ED44F92CF5F9C000FA6407 /* OutfitAura2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 55ED451E2CF5F9C100FA6407 /* Build configuration list for PBXNativeTarget "OutfitAura2" */;
+			buildPhases = (
+				55ED44F62CF5F9C000FA6407 /* Sources */,
+				55ED44F72CF5F9C000FA6407 /* Frameworks */,
+				55ED44F82CF5F9C000FA6407 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OutfitAura2;
+			packageProductDependencies = (
+				55ED45482CF60E7E00FA6407 /* GoogleSignIn */,
+				55ED454A2CF60E7E00FA6407 /* GoogleSignInSwift */,
+			);
+			productName = OutfitAura2;
+			productReference = 55ED44FA2CF5F9C000FA6407 /* OutfitAura2.app */;
+			productType = "com.apple.product-type.application";
+		};
+		55ED45092CF5F9C100FA6407 /* OutfitAura2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 55ED45212CF5F9C100FA6407 /* Build configuration list for PBXNativeTarget "OutfitAura2Tests" */;
+			buildPhases = (
+				55ED45062CF5F9C100FA6407 /* Sources */,
+				55ED45072CF5F9C100FA6407 /* Frameworks */,
+				55ED45082CF5F9C100FA6407 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				55ED450C2CF5F9C100FA6407 /* PBXTargetDependency */,
+			);
+			name = OutfitAura2Tests;
+			productName = OutfitAura2Tests;
+			productReference = 55ED450A2CF5F9C100FA6407 /* OutfitAura2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		55ED45132CF5F9C100FA6407 /* OutfitAura2UITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 55ED45242CF5F9C100FA6407 /* Build configuration list for PBXNativeTarget "OutfitAura2UITests" */;
+			buildPhases = (
+				55ED45102CF5F9C100FA6407 /* Sources */,
+				55ED45112CF5F9C100FA6407 /* Frameworks */,
+				55ED45122CF5F9C100FA6407 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				55ED45162CF5F9C100FA6407 /* PBXTargetDependency */,
+			);
+			name = OutfitAura2UITests;
+			productName = OutfitAura2UITests;
+			productReference = 55ED45142CF5F9C100FA6407 /* OutfitAura2UITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		55ED44F22CF5F9C000FA6407 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					55ED44F92CF5F9C000FA6407 = {
+						CreatedOnToolsVersion = 15.0.1;
+					};
+					55ED45092CF5F9C100FA6407 = {
+						CreatedOnToolsVersion = 15.0.1;
+						TestTargetID = 55ED44F92CF5F9C000FA6407;
+					};
+					55ED45132CF5F9C100FA6407 = {
+						CreatedOnToolsVersion = 15.0.1;
+						TestTargetID = 55ED44F92CF5F9C000FA6407;
+					};
+				};
+			};
+			buildConfigurationList = 55ED44F52CF5F9C000FA6407 /* Build configuration list for PBXProject "OutfitAura2" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 55ED44F12CF5F9C000FA6407;
+			packageReferences = (
+				55ED45472CF60E7E00FA6407 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			productRefGroup = 55ED44FB2CF5F9C000FA6407 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				55ED44F92CF5F9C000FA6407 /* OutfitAura2 */,
+				55ED45092CF5F9C100FA6407 /* OutfitAura2Tests */,
+				55ED45132CF5F9C100FA6407 /* OutfitAura2UITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		55ED44F82CF5F9C000FA6407 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55ED45512CF6205B00FA6407 /* info.plist in Resources */,
+				55ED45052CF5F9C100FA6407 /* Preview Assets.xcassets in Resources */,
+				55ED45462CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist in Resources */,
+				55ED45022CF5F9C100FA6407 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55ED45082CF5F9C100FA6407 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55ED45122CF5F9C100FA6407 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		55ED44F62CF5F9C000FA6407 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55ED45342CF5FA5800FA6407 /* LoginRequest.swift in Sources */,
+				55ED454F2CF6133B00FA6407 /* GoogleSignInViewModel.swift in Sources */,
+				55ED452A2CF5F9F500FA6407 /* SignUpView.swift in Sources */,
+				55ED45282CF5F9DF00FA6407 /* LoginView.swift in Sources */,
+				55ED45442CF5FB3500FA6407 /* ForgotPasswordRequest.swift in Sources */,
+				55ED453E2CF5FAE700FA6407 /* ResetPasswordView.swift in Sources */,
+				55ED453A2CF5FAB000FA6407 /* CameraView.swift in Sources */,
+				55ED45302CF5FA2D00FA6407 /* SignUpResponse.swift in Sources */,
+				55ED452E2CF5FA1A00FA6407 /* User.swift in Sources */,
+				55ED452C2CF5FA0E00FA6407 /* AuthService.swift in Sources */,
+				55ED45002CF5F9C000FA6407 /* ContentView.swift in Sources */,
+				55ED453C2CF5FAD400FA6407 /* ForgotPasswordView.swift in Sources */,
+				55ED45362CF5FA7900FA6407 /* SignUpRequest.swift in Sources */,
+				55ED454D2CF6130200FA6407 /* AppDelegate.swift in Sources */,
+				55ED45422CF5FB1A00FA6407 /* ResetPasswordResponse.swift in Sources */,
+				55ED45322CF5FA4400FA6407 /* LoginResponse.swift in Sources */,
+				55ED45382CF5FA9C00FA6407 /* HomePageView.swift in Sources */,
+				55ED44FE2CF5F9C000FA6407 /* OutfitAura2App.swift in Sources */,
+				55ED45402CF5FB0800FA6407 /* ResetPasswordRequest.swift in Sources */,
+				55DD87452CF8A1F9003C1755 /* UIImagePickerController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55ED45062CF5F9C100FA6407 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55ED450F2CF5F9C100FA6407 /* OutfitAura2Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55ED45102CF5F9C100FA6407 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55ED45192CF5F9C100FA6407 /* OutfitAura2UITests.swift in Sources */,
+				55ED451B2CF5F9C100FA6407 /* OutfitAura2UITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		55ED450C2CF5F9C100FA6407 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 55ED44F92CF5F9C000FA6407 /* OutfitAura2 */;
+			targetProxy = 55ED450B2CF5F9C100FA6407 /* PBXContainerItemProxy */;
+		};
+		55ED45162CF5F9C100FA6407 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 55ED44F92CF5F9C000FA6407 /* OutfitAura2 */;
+			targetProxy = 55ED45152CF5F9C100FA6407 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		55ED451C2CF5F9C100FA6407 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		55ED451D2CF5F9C100FA6407 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		55ED451F2CF5F9C100FA6407 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"OutfitAura2/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = esprit.OutfitAura2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		55ED45202CF5F9C100FA6407 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"OutfitAura2/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = esprit.OutfitAura2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		55ED45222CF5F9C100FA6407 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = esprit.OutfitAura2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OutfitAura2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OutfitAura2";
+			};
+			name = Debug;
+		};
+		55ED45232CF5F9C100FA6407 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = esprit.OutfitAura2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OutfitAura2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OutfitAura2";
+			};
+			name = Release;
+		};
+		55ED45252CF5F9C100FA6407 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = esprit.OutfitAura2UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OutfitAura2;
+			};
+			name = Debug;
+		};
+		55ED45262CF5F9C100FA6407 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = esprit.OutfitAura2UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OutfitAura2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		55ED44F52CF5F9C000FA6407 /* Build configuration list for PBXProject "OutfitAura2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55ED451C2CF5F9C100FA6407 /* Debug */,
+				55ED451D2CF5F9C100FA6407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		55ED451E2CF5F9C100FA6407 /* Build configuration list for PBXNativeTarget "OutfitAura2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55ED451F2CF5F9C100FA6407 /* Debug */,
+				55ED45202CF5F9C100FA6407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		55ED45212CF5F9C100FA6407 /* Build configuration list for PBXNativeTarget "OutfitAura2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55ED45222CF5F9C100FA6407 /* Debug */,
+				55ED45232CF5F9C100FA6407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		55ED45242CF5F9C100FA6407 /* Build configuration list for PBXNativeTarget "OutfitAura2UITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55ED45252CF5F9C100FA6407 /* Debug */,
+				55ED45262CF5F9C100FA6407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		55ED45472CF60E7E00FA6407 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		55ED45482CF60E7E00FA6407 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55ED45472CF60E7E00FA6407 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		55ED454A2CF60E7E00FA6407 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55ED45472CF60E7E00FA6407 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 55ED44F22CF5F9C000FA6407 /* Project object */;
+}
