@@ -9,12 +9,13 @@ import SwiftUI
 import UIKit
 
 @main
-struct OutfitAura2App: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+struct OutfitAuraApp: App {
+    @StateObject private var authService = AuthService()
 
     var body: some Scene {
         WindowGroup {
             LoginView()
+                .environmentObject(authService)
         }
     }
 }

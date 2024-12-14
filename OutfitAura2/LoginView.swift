@@ -8,6 +8,7 @@ struct LoginView: View {
     @State private var alertMessage = ""
     @State private var isLoggedIn = false
     @State private var user: GIDGoogleUser?
+    @EnvironmentObject var authService: AuthService // Inject AuthService as an environment object
 
     // Function to validate email format using regex
     func isValidEmail(_ email: String) -> Bool {
@@ -16,37 +17,29 @@ struct LoginView: View {
         return test.evaluate(with: email)
     }
     
-    // Function to handle Google Sign-In
-    func handleSignInWithGoogle() {
-        GIDSignIn.sharedInstance.signIn(withPresenting: getRootViewController()) { result, error in
-            if let error = error {
-                alertMessage = "Sign-In failed: \(error.localizedDescription)"
-                showAlert = true
-                return
-            }
-            
-            if let user = result?.user {
-                self.user = user
+    // Function to handle login
+    func handleLogin() {
+        guard isValidEmail(email) else {
+            alertMessage = "Please enter a valid email."
+            showAlert = true
+            return
+        }
+        
+        authService.login(email: email, password: password) { success, errorMessage in
+            if success {
                 isLoggedIn = true
+            } else {
+                alertMessage = errorMessage ?? "Login failed. Please try again."
+                showAlert = true
             }
         }
-    }
-
-    // Helper function to get the root view controller
-    func getRootViewController() -> UIViewController {
-        guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
-            fatalError("No root view controller found!")
-        }
-        return rootVC
     }
     
     var body: some View {
         NavigationStack {
             ZStack {
-               
                 Color.black.edgesIgnoringSafeArea(.all)
                 VStack {
-                  
                     Text("OUTFITAURA")
                         .font(.system(size: 36, weight: .bold))
                         .foregroundStyle(
@@ -57,40 +50,32 @@ struct LoginView: View {
                             )
                         )
                         .padding(.top, 60)
-
-                  
+                    
                     Image("v")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 290, height: 290)
                         .padding(.top, 10)
-
+                    
                     Spacer()
-
+                    
                     // Email TextField
                     TextField("Email", text: $email)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                         .background(Color(hex: "#BCFF5E"))
                         .frame(maxWidth: 350)
-
+                    
                     // Password SecureField
                     SecureField("Password", text: $password)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                         .background(Color(hex: "#BCFF5E"))
                         .frame(maxWidth: 350)
-
+                    
                     // Login Button
                     Button(action: {
-                        if isValidEmail(email) {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                isLoggedIn = true
-                            }
-                        } else {
-                            alertMessage = "Please enter a valid email."
-                            showAlert = true
-                        }
+                        handleLogin()
                     }) {
                         Text("Login")
                             .fontWeight(.bold)
@@ -101,7 +86,7 @@ struct LoginView: View {
                             .cornerRadius(10)
                     }
                     .padding()
-
+                    
                     // Sign Up Text Button
                     NavigationLink(
                         destination: SignUpView(),
@@ -123,10 +108,10 @@ struct LoginView: View {
                         }
                     )
                     .frame(maxWidth: .infinity)
-
+                    
                     // Google Sign-In Button
                     Button(action: {
-                        handleSignInWithGoogle() 
+                        
                     }) {
                         HStack {
                             Image("google-logo")
@@ -143,7 +128,7 @@ struct LoginView: View {
                         .cornerRadius(10)
                     }
                     .padding()
-
+                    
                     Spacer()
                 }
                 .alert(isPresented: $showAlert) {
@@ -154,9 +139,11 @@ struct LoginView: View {
                 }
                 .padding(.horizontal)
             }
+            .navigationBarBackButtonHidden(true)
         }
     }
 }
+
 
 // extension for using hex colors
 extension Color {

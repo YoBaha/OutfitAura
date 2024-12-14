@@ -30,12 +30,10 @@
 		55ED45402CF5FB0800FA6407 /* ResetPasswordRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED453F2CF5FB0800FA6407 /* ResetPasswordRequest.swift */; };
 		55ED45422CF5FB1A00FA6407 /* ResetPasswordResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45412CF5FB1A00FA6407 /* ResetPasswordResponse.swift */; };
 		55ED45442CF5FB3500FA6407 /* ForgotPasswordRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED45432CF5FB3500FA6407 /* ForgotPasswordRequest.swift */; };
-		55ED45462CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55ED45452CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist */; };
 		55ED45492CF60E7E00FA6407 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 55ED45482CF60E7E00FA6407 /* GoogleSignIn */; };
 		55ED454B2CF60E7E00FA6407 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 55ED454A2CF60E7E00FA6407 /* GoogleSignInSwift */; };
 		55ED454D2CF6130200FA6407 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED454C2CF6130200FA6407 /* AppDelegate.swift */; };
 		55ED454F2CF6133B00FA6407 /* GoogleSignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ED454E2CF6133B00FA6407 /* GoogleSignInViewModel.swift */; };
-		55ED45512CF6205B00FA6407 /* info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55ED45502CF6205B00FA6407 /* info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,10 +80,8 @@
 		55ED453F2CF5FB0800FA6407 /* ResetPasswordRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordRequest.swift; sourceTree = "<group>"; };
 		55ED45412CF5FB1A00FA6407 /* ResetPasswordResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordResponse.swift; sourceTree = "<group>"; };
 		55ED45432CF5FB3500FA6407 /* ForgotPasswordRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordRequest.swift; sourceTree = "<group>"; };
-		55ED45452CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist"; sourceTree = "<group>"; };
 		55ED454C2CF6130200FA6407 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		55ED454E2CF6133B00FA6407 /* GoogleSignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInViewModel.swift; sourceTree = "<group>"; };
-		55ED45502CF6205B00FA6407 /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,7 +134,6 @@
 		55ED44FC2CF5F9C000FA6407 /* OutfitAura2 */ = {
 			isa = PBXGroup;
 			children = (
-				55ED45452CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist */,
 				55ED44FD2CF5F9C000FA6407 /* OutfitAura2App.swift */,
 				55ED44FF2CF5F9C000FA6407 /* ContentView.swift */,
 				55ED45012CF5F9C100FA6407 /* Assets.xcassets */,
@@ -160,7 +155,6 @@
 				55ED45432CF5FB3500FA6407 /* ForgotPasswordRequest.swift */,
 				55ED454C2CF6130200FA6407 /* AppDelegate.swift */,
 				55ED454E2CF6133B00FA6407 /* GoogleSignInViewModel.swift */,
-				55ED45502CF6205B00FA6407 /* info.plist */,
 				55DD87442CF8A1F9003C1755 /* UIImagePickerController.swift */,
 			);
 			path = OutfitAura2;
@@ -302,9 +296,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55ED45512CF6205B00FA6407 /* info.plist in Resources */,
 				55ED45052CF5F9C100FA6407 /* Preview Assets.xcassets in Resources */,
-				55ED45462CF60BD900FA6407 /* client_710576853212-cikv2iv23aobn9t2qt7s2hif3k2q5c9q.apps.googleusercontent.com.plist in Resources */,
 				55ED45022CF5F9C100FA6407 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

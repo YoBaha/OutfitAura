@@ -5,11 +5,11 @@
 //  Created by OutfitAura on 26/11/2024.
 //
 
-import Foundation
+import Foundation	
 
 class AuthService: ObservableObject {
     @Published var isAuthenticated = false
-    @Published var errorMessage: String? = nil
+    @Published var errorMessage: String? = nil	
     private let baseURL = "http://localhost:3000" // Backend URL
     
     // SignUp
