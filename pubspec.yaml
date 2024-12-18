@@ -30,7 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  tflite: ^1.1.2
+  tflite_flutter: ^0.11.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -40,7 +41,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  file_picker: ^8.1.6
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -64,6 +65,8 @@ flutter:
     - assets/model4.jpg 
     - assets/card.jpg 
     - assets/card2.jpg
+    - assets/clothing_model.tflite
+    - assets/labels.txt
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

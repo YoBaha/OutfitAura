@@ -1,0 +1,11 @@
+0 dress
+1 hat
+2 hoodie
+3 longsleeve
+4 outwear
+5 pants
+6 shirt
+7 shoes
+8 shorts
+9 skirt
+10 t-shirt

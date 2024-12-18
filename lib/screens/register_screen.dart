@@ -48,13 +48,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("Register"),
-        backgroundColor: Color(0xFF282b30),
+        backgroundColor: const Color(0xFF282b30),
       ),
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.only(top: 40, bottom: 20),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFFBCFF5E), Color(0xFF282b30)],
                 begin: Alignment.topLeft,
@@ -87,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     filled: true,
-                    fillColor: Color(0xFFBCFF5E),
+                    fillColor: const Color(0xFFBCFF5E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     filled: true,
-                    fillColor: Color(0xFFBCFF5E),
+                    fillColor: const Color(0xFFBCFF5E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -121,7 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          Color(0xFFBCFF5E), // Set the button color
+                          const Color(0xFFBCFF5E), // Set the button color
                     ),
                     onPressed: _register,
                     child: const Text(
