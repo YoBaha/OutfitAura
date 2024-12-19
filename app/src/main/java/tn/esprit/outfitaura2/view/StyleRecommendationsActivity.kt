@@ -32,7 +32,7 @@ class StyleRecommendationsActivity : ComponentActivity() {
 
         // Update the ViewModel with the selected style
         homeViewModel.setStyleFromActivity(selectedStyle)
-scfe
+
         // Set the content with the selected style
         setContent {
             StyleRecommendationScreen(

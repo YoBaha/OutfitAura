@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">OutfitAura2</string>
+    <string name="weather_api_key">e75f4675d7d22206aba35adb9e281284</string>
+
 </resources>

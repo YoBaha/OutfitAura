@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -115,10 +116,12 @@ class SignUpActivity : ComponentActivity() {
         navigateToLogin: () -> Unit
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bg2),
+                painter = painterResource(id = R.drawable.bg3),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -141,8 +144,9 @@ class SignUpActivity : ComponentActivity() {
                 Text(
                     text = "Sign Up",
                     style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White // Set the color of the text to white
+                    color = Color.White
                 )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
@@ -157,14 +161,9 @@ class SignUpActivity : ComponentActivity() {
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
-                        disabledTextColor = Color.Gray,
-                        errorTextColor = Color.Red,
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        cursorColor = Color.White,
-                        errorCursorColor = Color.Red
+                        cursorColor = Color.White
                     )
                 )
 
@@ -183,17 +182,11 @@ class SignUpActivity : ComponentActivity() {
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
-                        disabledTextColor = Color.Gray,
-                        errorTextColor = Color.Red,
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        cursorColor = Color.White,
-                        errorCursorColor = Color.Red
+                        cursorColor = Color.White
                     )
                 )
-
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -205,14 +198,15 @@ class SignUpActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        contentColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     ),
                     enabled = !isLoading
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = Color.White
+                            color = Color.Black
                         )
                     } else {
                         Text("Sign Up")
@@ -225,7 +219,8 @@ class SignUpActivity : ComponentActivity() {
                     onClick = { navigateToLogin() },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        contentColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     )
                 ) {
                     Text("Already have an account? Log In")

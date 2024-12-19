@@ -52,13 +52,17 @@ import androidx.core.content.ContextCompat.startActivity
 import tn.esprit.outfitaura2.LoginActivity
 import tn.esprit.outfitaura2.view.SessionManager
 import android.util.Base64
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import tn.esprit.outfitaura2.view.StyleRecommendationsActivity
 import java.io.ByteArrayOutputStream
+import tn.esprit.outfitaura2.viewmodels.WeatherService
 
 
 class HomeActivity : ComponentActivity() {
 
     private val homeViewModel: HomeViewModel by viewModels()
+    private lateinit var weatherApiClient: WeatherApiClient
     private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
     private lateinit var galleryLauncher: ActivityResultLauncher<String>
     private lateinit var photoUri: Uri
@@ -76,6 +80,9 @@ class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize the WeatherApiClient
+        weatherApiClient = WeatherApiClient()
 
         // Initialize classifiers
         clothingClassifier = ClothingClassifier("clothing_model.tflite", assets)
@@ -104,6 +111,28 @@ class HomeActivity : ComponentActivity() {
                 )
             }
         }
+
+        // Fetch weather data
+        getWeatherData("London", "your_api_key")
+    }
+
+    private fun getWeatherData(city: String, apiKey: String) {
+        weatherApiClient.getWeather(city, apiKey,
+            onSuccess = { weatherResponse ->
+                val temperature = weatherResponse.main.temp
+                val description = weatherResponse.weather.firstOrNull()?.description
+                showWeatherInfo(temperature, description)
+            },
+            onError = { errorMessage ->
+                showToast("Error: $errorMessage")
+            }
+        )
+    }
+
+    private fun showWeatherInfo(temperature: Float, description: String?) {
+        val weatherInfo = "Temp: $temperature°C, Description: $description"
+        // Show weather info on top of the screen
+        showToast(weatherInfo)
     }
 
     private fun checkCameraPermission() {
@@ -180,7 +209,8 @@ fun HomeScreen(
     )
 
     var searchText by remember { mutableStateOf("") }
-    var selectedStyle by remember { mutableStateOf("") } // Track selected style
+    var selectedStyle by remember { mutableStateOf("")} // Track selected style
+    val weatherInfo = remember { mutableStateOf("")}
 
     Box(
         modifier = Modifier

@@ -39,4 +39,3 @@ class HomeViewModel : ViewModel() {
         _selectedStyle.value = style
     }
 }
-
