@@ -6,20 +6,18 @@ import tn.esprit.outfitaura2.network.User
 class SessionManager(context: Context) {
     private val sharedPref = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
 
-    // Save user data with email instead of login
+    // Save user data
     fun saveUser(user: User) {
         val editor = sharedPref.edit()
-        editor.putInt("user_id", user.id)
-        editor.putString("user_email", user.email) // Save email instead of login
+        editor.putString("user_email", user.email)  // Only save the email now
         editor.apply()
     }
 
     // Retrieve user data
     fun getUser(): User? {
-        val userId = sharedPref.getInt("user_id", -1)
-        val userEmail = sharedPref.getString("user_email", null) // Retrieve email instead of login
-        return if (userId != -1 && userEmail != null) {
-            User(userId, userEmail) // Use email instead of login
+        val userEmail = sharedPref.getString("user_email", null)
+        return if (userEmail != null) {
+            User(userEmail)  // Only create the User object with email
         } else null
     }
 
@@ -28,5 +26,10 @@ class SessionManager(context: Context) {
         val editor = sharedPref.edit()
         editor.clear()
         editor.apply()
+    }
+
+    // Check if user is logged in
+    fun isLoggedIn(): Boolean {
+        return sharedPref.contains("user_email")  // Check if the email exists in the shared preferences
     }
 }

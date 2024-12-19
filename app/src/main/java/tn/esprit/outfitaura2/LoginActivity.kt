@@ -26,12 +26,19 @@
     import androidx.compose.ui.res.painterResource
     import tn.esprit.outfitaura2.models.LoginRequest
     import tn.esprit.outfitaura2.models.LoginResponse
+    import tn.esprit.outfitaura2.network.User
     import tn.esprit.outfitaura2.ui.theme.WhiteColor
+    import tn.esprit.outfitaura2.view.SessionManager
     import tn.esprit.outfitaura2.viewmodels.HomeActivity
 
     class LoginActivity : ComponentActivity() {
+
+        private lateinit var sessionManager: SessionManager
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
+            sessionManager = SessionManager(this)  // Initialize session manager
+
             setContent {
                 OutfitAura2Theme {
                     LoginScreen(
@@ -57,6 +64,8 @@
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
                         if (loginResponse?.success == true) {
+                            val user = User(email)  // Assuming login response contains user ID
+                            sessionManager.saveUser(user)  // Save user session
                             showToast("Login Successful")
                             navigateToHomeActivity()
                         } else {
@@ -93,6 +102,7 @@
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
+
 
     @Composable
     fun LoginScreen(

@@ -4,11 +4,17 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe()); // This enables validation globally
+  app.useGlobalPipes(new ValidationPipe()); 
   
-  // Enable CORS to allow cross-origin requests from your Android device
-  app.enableCors();
+  
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept',
+  });
+  
+  
+  await app.listen(3000, '0.0.0.0');  
 
-  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

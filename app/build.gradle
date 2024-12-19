@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'tn.esprit.outfitaura2'
+    namespace "tn.esprit.outfitaura2"
     compileSdk 35
 
     defaultConfig {
@@ -52,6 +52,16 @@ dependencies {
     implementation libs.tensorflow.lite
     implementation libs.tensorflow.lite.support
 
+
+    implementation libs.androidx.material3.v121
+    implementation libs.ui
+    implementation libs.androidx.foundation.v161
+
+    implementation libs.androidx.room.runtime
+    annotationProcessor libs.androidx.room.compiler
+    // For Kotlin use kapt instead of annotationProcessor
+    //kapt "androidx.room:room-compiler:2.6.1"
+
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -59,6 +69,9 @@ dependencies {
     androidTestImplementation libs.androidx.ui.test.junit4
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest
+
+    implementation libs.material3
+    implementation libs.androidx.foundation
 
     // Add Retrofit dependencies
     implementation libs.retrofit

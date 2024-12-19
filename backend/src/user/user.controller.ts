@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpRequest, SignUpResponse } from './sign-up.dto';
 
@@ -7,6 +7,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK) // Ensure the status code is 200 for successful login
   async login(@Body() body: { email: string; password: string }) {
     const user = await this.userService.validateUser(body.email, body.password);
 

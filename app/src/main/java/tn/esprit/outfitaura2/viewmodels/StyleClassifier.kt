@@ -1,5 +1,4 @@
 package tn.esprit.outfitaura2.viewmodels
-
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import org.tensorflow.lite.Interpreter
@@ -10,7 +9,8 @@ import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
-class ClothingClassifier(modelPath: String, assetManager: AssetManager) {
+
+class StyleClassifier(modelPath: String, assetManager: AssetManager) {
 
     private val interpreter: Interpreter
 
@@ -39,7 +39,7 @@ class ClothingClassifier(modelPath: String, assetManager: AssetManager) {
 
         // Define the output buffer for the model's predictions
         val outputBuffer = TensorBuffer.createFixedSize(
-            intArrayOf(1, 11), // Adjust dimensions to match model output
+            intArrayOf(1, 4), // Adjust dimensions to match style model output
             org.tensorflow.lite.DataType.FLOAT32
         )
 

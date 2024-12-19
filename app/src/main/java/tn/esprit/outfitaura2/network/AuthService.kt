@@ -12,7 +12,7 @@ import tn.esprit.outfitaura2.models.SignUpRequest
 import tn.esprit.outfitaura2.models.SignUpResponse
 
 data class User(
-    val id: Int,
+   // val id: Int,
     val email: String
 )
 
