@@ -33,6 +33,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import tn.esprit.outfitaura2.LoginActivity
+import tn.esprit.outfitaura2.models.CategoryResponse
 import tn.esprit.outfitaura2.models.Product
 import tn.esprit.outfitaura2.models.ProductResponse
 import tn.esprit.outfitaura2.network.ApiClient
@@ -64,9 +65,48 @@ fun MarketplaceScreen(
     var products by remember { mutableStateOf<List<Product>>(emptyList()) }
     val context = LocalContext.current
 
+    // Clothing-related keywords for filtering
+    val clothingKeywords = listOf(
+        "classic", "Classic", "Majestic"
+    )
+    val nonClothingKeywords = listOf("watch")
+
     LaunchedEffect(Unit) {
-        val call = ApiClient.getMarketplaceService(context).getProducts(offset = 0, limit = 10)
-        ApiClient.tagCall(call, context, OnUnauthorizedCallback { ctx: Context ->
+        // Fetch categories for debugging
+        val categoryCall = ApiClient.getMarketplaceService(context).getCategories()
+        ApiClient.tagCall(categoryCall, context, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            (ctx as? ComponentActivity)?.finish()
+        }).enqueue(object : Callback<CategoryResponse> {
+            override fun onResponse(call: Call<CategoryResponse>, response: Response<CategoryResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { categoryResponse ->
+                        if (categoryResponse.success) {
+                            Log.d("MarketplaceScreen", "Categories: ${categoryResponse.categories}")
+                        } else {
+                            Log.e("MarketplaceScreen", "Failed to fetch categories: ${categoryResponse.error}")
+                        }
+                    }
+                } else {
+                    Log.e("MarketplaceScreen", "Category fetch failed: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<CategoryResponse>, t: Throwable) {
+                Log.e("MarketplaceScreen", "Category fetch failed: ${t.message}")
+            }
+        })
+
+        // Fetch clothing products
+        val productCall = ApiClient.getMarketplaceService(context).getProducts(
+            offset = 0,
+            limit = 10,
+            categorySlug = "clothes"
+        )
+        ApiClient.tagCall(productCall, context, OnUnauthorizedCallback { ctx: Context ->
             ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
             ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -77,8 +117,17 @@ fun MarketplaceScreen(
                 if (response.isSuccessful) {
                     response.body()?.let { productResponse ->
                         if (productResponse.success) {
-                            products = productResponse.products
-                            Log.d("MarketplaceScreen", "Fetched ${products.size} products")
+                            // Filter products by title
+                            products = productResponse.products.filter { product ->
+                                val titleLower = product.title.lowercase()
+                                val isClothing = clothingKeywords.any { titleLower.contains(it) } ||
+                                        !nonClothingKeywords.any { titleLower.contains(it) }
+                                if (!isClothing) {
+                                    Log.w("MarketplaceScreen", "Filtered out non-clothing product: ${product.title}")
+                                }
+                                isClothing
+                            }
+                            Log.d("MarketplaceScreen", "Fetched ${products.size} clothing products")
                         } else {
                             Log.e("MarketplaceScreen", "Failed to fetch products: ${productResponse.error}")
                             Toast.makeText(context, "Failed to load products", Toast.LENGTH_SHORT).show()
@@ -115,7 +164,7 @@ fun MarketplaceScreen(
                 )
             }
             Text(
-                text = "Marketplace",
+                text = "Marketplace - Clothing",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
