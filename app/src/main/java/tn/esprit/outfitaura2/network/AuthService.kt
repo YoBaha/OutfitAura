@@ -12,6 +12,8 @@ import tn.esprit.outfitaura2.models.ResetPasswordRequest
 import tn.esprit.outfitaura2.models.ResetPasswordResponse
 import tn.esprit.outfitaura2.models.SignUpRequest
 import tn.esprit.outfitaura2.models.SignUpResponse
+import tn.esprit.outfitaura2.models.VerifyCodeRequest
+import tn.esprit.outfitaura2.models.VerifyCodeResponse
 
 data class User(
     val email: String
@@ -27,6 +29,9 @@ interface AuthService {
     @POST("api/user/forgot-password")
     fun forgotPassword(@Body request: ForgotPasswordRequest): Call<ForgotPasswordResponse>
 
-    @POST("api/user/reset-password/{token}")
-   fun resetPassword(@Path("token") token: String, @Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
+    @POST("api/user/verify-code")
+    fun verifyCode(@Body request: VerifyCodeRequest): Call<VerifyCodeResponse>
+
+    @POST("api/user/reset-password")
+    fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
 }

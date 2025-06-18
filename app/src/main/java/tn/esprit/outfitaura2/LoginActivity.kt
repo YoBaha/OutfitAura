@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -32,7 +31,9 @@ import tn.esprit.outfitaura2.models.LoginResponse
 import tn.esprit.outfitaura2.network.ApiClient
 import tn.esprit.outfitaura2.network.OnUnauthorizedCallback
 import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
+import tn.esprit.outfitaura2.ForgotPasswordActivity
 import tn.esprit.outfitaura2.viewmodels.HomeActivity
+import tn.esprit.outfitaura2.SignUpActivity
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +77,6 @@ class LoginActivity : ComponentActivity() {
         ApiClient.tagCall(call, this, OnUnauthorizedCallback { ctx: Context ->
             ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
             showToast("Session expired. Please log in again.")
-            // Already in LoginActivity, so no need to navigate
         }).enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
@@ -143,20 +143,19 @@ fun LoginUI(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Removed background image for consistency with other screens
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 20.dp),
+                .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = R.drawable.a),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(200.dp) // Reduced size for better balance
+                modifier = Modifier.size(180.dp)
             )
-            Spacer(modifier = Modifier.height(32.dp)) // Increased spacing
+            Spacer(modifier = Modifier.height(40.dp))
             Text(
                 text = "Log In",
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -164,11 +163,11 @@ fun LoginUI(
                     color = Color(0xFFF83758)
                 )
             )
-            Spacer(modifier = Modifier.height(32.dp)) // Increased spacing
+            Spacer(modifier = Modifier.height(40.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                label = { Text("Email", color = Color(0xFF000000)) },
+                label = { Text("Email", color = Color.Black) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -184,11 +183,11 @@ fun LoginUI(
                     cursorColor = Color(0xFFF83758)
                 )
             )
-            Spacer(modifier = Modifier.height(20.dp)) // Increased spacing
+            Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
-                label = { Text("Password", color = Color(0xFF000000)) },
+                label = { Text("Password", color = Color.Black) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -205,7 +204,7 @@ fun LoginUI(
                     cursorColor = Color(0xFFF83758)
                 )
             )
-            Spacer(modifier = Modifier.height(24.dp)) // Increased spacing
+            Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
                     if (!isLoading) {
@@ -214,7 +213,7 @@ fun LoginUI(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp), // Consistent button height
+                    .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFF83758),
                     contentColor = Color.White
@@ -232,11 +231,16 @@ fun LoginUI(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            TextButton(onClick = navigateToSignUp) {
-                Text("Don't have an account? Sign Up", color = Color(0xFFF83758))
-            }
-            TextButton(onClick = navigateToForgotPassword) {
-                Text("Forgot Password?", color = Color(0xFFF83758))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextButton(onClick = navigateToSignUp) {
+                    Text("Don't have an account? Sign Up", color = Color(0xFFF83758))
+                }
+                TextButton(onClick = navigateToForgotPassword) {
+                    Text("Forgot Password?", color = Color(0xFFF83758))
+                }
             }
         }
     }

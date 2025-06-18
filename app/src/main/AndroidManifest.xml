@@ -42,7 +42,10 @@
         <activity android:name=".viewmodels.RecommendationActivity" android:exported="false" />
         <activity android:name=".viewmodels.WardrobeActivity" android:exported="false" />
         <activity android:name=".viewmodels.MarketplaceActivity" />
-
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:exported="false">
+        </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
