@@ -19,25 +19,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 // Color definitions
-private val Purple = Color(0xFFD0BCFF) // Light variant for dark mode
-private val PurpleGrey = Color(0xFFCCC2DC) // Light variant
-private val Pink = Color(0xFFEFB8C8) // Light variant
-
-private val Purpledark = Color(0xFF6650a4) // Dark variant for light mode
-private val PurpleGreydark = Color(0xFF625b71) // Dark variant
-private val Pinkdark = Color(0xFF7D5260) // Dark variant
+private val PrimaryColor = Color(0xFFF83758) // Main color from your design
+private val SecondaryColor = Color(0xFFFAA7B2) // Lighter shade for accents
+private val TertiaryColor = Color(0xFFCC2F4D) // Darker shade for contrast
 
 // Color schemes
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple,
-    secondary = PurpleGrey,
-    tertiary = Pink
+    primary = PrimaryColor,
+    secondary = SecondaryColor,
+    tertiary = TertiaryColor,
+    background = Color.Black,
+    surface = Color(0xFF1E1E1E)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purpledark,
-    secondary = PurpleGreydark,
-    tertiary = Pinkdark
+    primary = PrimaryColor,
+    secondary = SecondaryColor,
+    tertiary = TertiaryColor,
+    background = Color.White,
+    surface = Color.White
     /* Other default colors to override */
 )
 
@@ -48,6 +48,11 @@ val OutfitTypography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
+    ),
+    headlineLarge = TextStyle(
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        color = PrimaryColor
     )
 )
 

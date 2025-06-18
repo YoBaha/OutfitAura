@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -82,6 +83,7 @@ fun RecommendationScreen(
     gender: String
 ) {
     var currentIndex by remember { mutableStateOf(0) }
+    val context = LocalContext.current
     val recommendations = when (gender) {
         "Women" -> mapOf(
             "Formal" to listOf("suit-women" to "Suit", "dress" to "Dress", "skirt" to "Skirt", "pants" to "Pants"),
@@ -153,21 +155,23 @@ fun RecommendationScreen(
     Log.d("RecommendationScreen", "currentCombination: $currentCombination")
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(24.dp), // Increased spacing
             contentPadding = PaddingValues(bottom = 80.dp) // Space for button
         ) {
             item {
                 Text(
                     text = "Recommended $recommendationType Outfit",
-                    fontSize = 24.sp,
+                    fontSize = 28.sp, // Increased font size
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = Color(0xFFF83758),
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
@@ -176,7 +180,7 @@ fun RecommendationScreen(
                     Text(
                         text = "No matching items found for $recommendationType outfit. Upload more items in Home!",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Color(0xFF000000),
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -188,19 +192,20 @@ fun RecommendationScreen(
 
                     Card(
                         modifier = Modifier
-                            .width(120.dp)
-                            .height(150.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                            .width(140.dp) // Increased width
+                            .height(180.dp) // Increased height
+                            .clip(RoundedCornerShape(16.dp)), // Larger rounded corners
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), // Increased elevation
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier.padding(12.dp)
                         ) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
+                                    ImageRequest.Builder(context)
                                         .data(imageUrl)
                                         .error(android.R.drawable.ic_menu_gallery)
                                         .placeholder(android.R.drawable.ic_menu_gallery)
@@ -216,16 +221,17 @@ fun RecommendationScreen(
                                 ),
                                 contentDescription = "$layerName Image",
                                 modifier = Modifier
-                                    .size(80.dp)
+                                    .size(100.dp) // Increased image size
                                     .clip(RoundedCornerShape(8.dp))
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = if (imageId.isEmpty()) "No $layerName available" else layerName,
                                 fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                color = Color.Black,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
@@ -239,11 +245,13 @@ fun RecommendationScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(50.dp) // Consistent button height
                     .align(Alignment.BottomCenter)
                     .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF83758), contentColor = Color.White),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Change Outfit", color = Color.White)
+                Text("Change Outfit", fontSize = 16.sp)
             }
         }
     }

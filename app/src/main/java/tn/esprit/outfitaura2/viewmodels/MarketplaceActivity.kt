@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -66,9 +67,7 @@ fun MarketplaceScreen(
     val context = LocalContext.current
 
     // Clothing-related keywords for filtering
-    val clothingKeywords = listOf(
-        "classic", "Classic", "Majestic"
-    )
+    val clothingKeywords = listOf("classic", "Classic", "Majestic")
     val nonClothingKeywords = listOf("watch")
 
     LaunchedEffect(Unit) {
@@ -117,7 +116,6 @@ fun MarketplaceScreen(
                 if (response.isSuccessful) {
                     response.body()?.let { productResponse ->
                         if (productResponse.success) {
-                            // Filter products by title
                             products = productResponse.products.filter { product ->
                                 val titleLower = product.title.lowercase()
                                 val isClothing = clothingKeywords.any { titleLower.contains(it) } ||
@@ -149,10 +147,13 @@ fun MarketplaceScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -160,22 +161,24 @@ fun MarketplaceScreen(
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_menu_revert),
                     contentDescription = "Back",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(36.dp),
+                    tint = Color(0xFFF83758)
                 )
             }
             Text(
                 text = "Marketplace - Clothing",
-                fontSize = 24.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
+                color = Color(0xFFF83758),
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(8.dp)
         ) {
             items(products.size) { index ->
                 val product = products[index]
@@ -190,21 +193,22 @@ fun MarketplaceScreen(
                 items(4) {
                     Column(
                         modifier = Modifier
-                            .width(120.dp)
-                            .height(180.dp)
-                            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                            .width(140.dp)
+                            .height(200.dp)
+                            .border(2.dp, Color(0xFFC2C8DA), RoundedCornerShape(16.dp)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             painter = painterResource(id = android.R.drawable.ic_menu_gallery),
                             contentDescription = "Placeholder",
-                            modifier = Modifier.size(80.dp)
+                            modifier = Modifier.size(80.dp),
+                            tint = Color(0xFFC2C8DA)
                         )
                         Text(
                             text = "Loading...",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            fontSize = 14.sp,
+                            color = Color(0xFF000000)
                         )
                     }
                 }
@@ -220,17 +224,18 @@ fun ProductCard(
 ) {
     Card(
         modifier = Modifier
-            .width(120.dp)
-            .height(180.dp)
-            .clip(RoundedCornerShape(12.dp)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .width(140.dp)
+            .height(220.dp) // Increased height to accommodate longer titles and button
+            .clip(RoundedCornerShape(16.dp)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(12.dp)
         ) {
             val context = LocalContext.current
             val imageUrl = product.images.firstOrNull() ?: "https://placehold.co/600x400"
@@ -245,32 +250,47 @@ fun ProductCard(
                 painter = painter,
                 contentDescription = product.title,
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Fit
             )
-            Text(
-                text = product.title,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = "$${product.price}",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f) // Allows text to expand while reserving space for the button
+                    .padding(vertical = 4.dp)
+            ) {
+                Text(
+                    text = product.title,
+                    fontSize = 14.sp,
+                    color = Color.Black,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "$${product.price}",
+                    fontSize = 14.sp,
+                    color = Color(0xFFF83758),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = onAddToCart,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp) // Increased height for better visibility
+                    .padding(top = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF83758), contentColor = Color.White),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = "Add to Cart",
-                    fontSize = 12.sp,
-                    color = Color.White
+                    fontSize = 14.sp, // Increased font size for clarity
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

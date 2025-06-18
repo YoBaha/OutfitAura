@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -24,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -108,34 +110,44 @@ fun WardrobeScreen(
     showDeleteDialog?.let { imageId ->
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
-            title = { Text("Delete Image") },
-            text = { Text("Are you sure you want to permanently delete this image?") },
+            title = { Text("Delete Image", color = Color.Black, fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to permanently delete this image?", color = Color.Black) },
             confirmButton = {
                 Button(
                     onClick = {
                         deleteImage(imageId)
                         showDeleteDialog = null
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF83758), contentColor = Color.White),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Delete", color = Color.White)
+                    Text("Delete")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDeleteDialog = null }) {
+                Button(
+                    onClick = { showDeleteDialog = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2C8DA), contentColor = Color.Black),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
                     Text("Cancel")
                 }
-            }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp)
         )
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -143,22 +155,24 @@ fun WardrobeScreen(
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_menu_revert),
                     contentDescription = "Back",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(36.dp),
+                    tint = Color(0xFFF83758)
                 )
             }
             Text(
                 text = "My Wardrobe",
-                fontSize = 24.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
+                color = Color(0xFFF83758),
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(8.dp)
         ) {
             items(clothingImages.size) { index ->
                 val (imageId, prediction) = clothingImages[index]
@@ -168,19 +182,19 @@ fun WardrobeScreen(
                 }
                 Box(
                     modifier = Modifier
-                        .width(120.dp)
-                        .height(120.dp)
-                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                        .width(140.dp)
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFC2C8DA), RoundedCornerShape(16.dp))
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(8.dp)
+                            .padding(12.dp)
                     ) {
                         val imageUrl = "http://10.0.2.2:4000/api/images/$imageId"
-                        val context = LocalContext.current
                         val token = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
                             .getString("jwt_token", null)
                         val painter = rememberAsyncImagePainter(
@@ -207,29 +221,33 @@ fun WardrobeScreen(
                             painter = painter,
                             contentDescription = "Clothing Item",
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .size(80.dp),
+                                .size(100.dp)
+                                .clip(RoundedCornerShape(8.dp)),
                             contentScale = ContentScale.Fit
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Type: $prediction",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontSize = 14.sp,
+                            color = Color.Black,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                     IconButton(
                         onClick = { showDeleteDialog = imageId },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(4.dp)
-                            .size(20.dp)
+                            .padding(8.dp)
+                            .size(28.dp)
+                            .border(1.dp, Color(0xFFF83758), RoundedCornerShape(50))
                     ) {
                         Icon(
                             painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                             contentDescription = "Delete Image",
-                            tint = Color.Red,
-                            modifier = Modifier.size(16.dp)
+                            tint = Color(0xFFF83758),
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -238,16 +256,17 @@ fun WardrobeScreen(
                 items(4) {
                     Column(
                         modifier = Modifier
-                            .width(120.dp)
-                            .height(120.dp)
-                            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                            .width(140.dp)
+                            .height(180.dp)
+                            .border(2.dp, Color(0xFFC2C8DA), RoundedCornerShape(16.dp)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             painter = painterResource(id = android.R.drawable.ic_menu_gallery),
                             contentDescription = "Placeholder",
-                            modifier = Modifier.size(80.dp)
+                            modifier = Modifier.size(80.dp),
+                            tint = Color(0xFFC2C8DA)
                         )
                     }
                 }

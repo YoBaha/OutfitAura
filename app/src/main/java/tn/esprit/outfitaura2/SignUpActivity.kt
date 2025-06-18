@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -121,102 +124,109 @@ fun SignUpUI(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color.White)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.bg3),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        // Removed background image for consistency with other screens
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = R.drawable.a),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(250.dp)
+                modifier = Modifier.size(200.dp) // Reduced size for better balance
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp)) // Increased spacing
             Text(
                 text = "Sign Up",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFF83758)
+                )
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp)) // Increased spacing
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                label = { Text("Email", color = Color.White) },
+                label = { Text("Email", color = Color.Black) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 ),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, RoundedCornerShape(8.dp)),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    cursorColor = Color.White
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedBorderColor = Color(0xFFC2C8DA),
+                    unfocusedBorderColor = Color(0xFFC2C8DA),
+                    cursorColor = Color(0xFFF83758)
                 )
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp)) // Increased spacing
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
-                label = { Text("Password", color = Color.White) },
+                label = { Text("Password", color = Color.Black) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, RoundedCornerShape(8.dp)),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    cursorColor = Color.White
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedBorderColor = Color(0xFFC2C8DA),
+                    unfocusedBorderColor = Color(0xFFC2C8DA),
+                    cursorColor = Color(0xFFF83758)
                 )
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp)) // Increased spacing
             Button(
                 onClick = {
                     if (!isLoading) {
                         onSignUpClick(email, password)
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp), // Consistent button height
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
+                    containerColor = Color(0xFFF83758),
+                    contentColor = Color.White
                 ),
+                shape = RoundedCornerShape(8.dp),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = Color.Black
+                        color = Color.White
                     )
                 } else {
-                    Text("Sign Up")
+                    Text("Sign Up", fontSize = 16.sp)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = { navigateToLogin() },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp), // Consistent button height
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
+                    containerColor = Color(0xFFC2C8DA),
                     contentColor = Color.Black
-                )
+                ),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Already have an account? Log In")
+                Text("Already have an account? Log In", fontSize = 14.sp)
             }
         }
     }

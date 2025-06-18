@@ -16,6 +16,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -261,7 +262,6 @@ class HomeActivity : ComponentActivity() {
         })
     }
 }
-
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -277,6 +277,13 @@ fun HomeScreen(
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf<String?>(null) }
 
+    // Updated colors based on your preference (#F83758) and theme
+    val primaryColor = Color(0xFFF83758) // Main color from your request
+    val backgroundColor = Color.White // White background for a clean look
+    val textColor = Color.Black // Black for readability
+    val secondaryColor = Color(0xFFC2C8DA) // Light gray for borders and accents
+    val whiteColor = Color.White // Explicitly defined for clarity
+
     fun deleteImage(imageId: String) {
         val call = ApiClient.getImageService(context).deleteImage(imageId)
         ApiClient.tagCall(call, context, OnUnauthorizedCallback { ctx: Context ->
@@ -291,21 +298,17 @@ fun HomeScreen(
                     response.body()?.let { deleteResponse ->
                         if (deleteResponse.success) {
                             onDeleteImage(imageId)
-                            Log.d("HomeActivity", "Image deleted: $imageId")
                             Toast.makeText(context, "Image deleted successfully", Toast.LENGTH_SHORT).show()
                         } else {
-                            Log.e("HomeActivity", "Delete failed: ${deleteResponse.error}")
                             Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
-                    Log.e("HomeActivity", "Delete failed: ${response.errorBody()?.string()}")
                     Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<DeleteResponse>, t: Throwable) {
-                Log.e("HomeActivity", "Delete failed: ${t.message}")
                 Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
             }
         })
@@ -314,60 +317,70 @@ fun HomeScreen(
     showDeleteDialog?.let { imageId ->
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
-            title = { Text("Delete Image") },
-            text = { Text("Are you sure you want to permanently delete this image?") },
+            title = { Text("Delete Image", color = textColor, fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to permanently delete this image?", color = textColor) },
             confirmButton = {
                 Button(
                     onClick = {
                         deleteImage(imageId)
                         showDeleteDialog = null
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    colors = ButtonDefaults.buttonColors(containerColor = primaryColor, contentColor = whiteColor),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Delete", color = Color.White)
+                    Text("Delete")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDeleteDialog = null }) {
+                Button(
+                    onClick = { showDeleteDialog = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = secondaryColor, contentColor = textColor),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
                     Text("Cancel")
                 }
-            }
+            },
+            containerColor = whiteColor,
+            shape = RoundedCornerShape(16.dp)
         )
     }
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .background(backgroundColor)
+            .padding(horizontal = 20.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Gender",
-                    fontSize = 20.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = primaryColor
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = if (isMale) "Men" else "Women",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        fontSize = 18.sp,
+                        color = textColor
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
                     Switch(
                         checked = isMale,
                         onCheckedChange = { isMale = it },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            checkedThumbColor = primaryColor,
+                            checkedTrackColor = secondaryColor,
+                            uncheckedThumbColor = textColor.copy(alpha = 0.5f),
+                            uncheckedTrackColor = secondaryColor.copy(alpha = 0.3f)
                         )
                     )
                 }
@@ -379,141 +392,156 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                colors = CardDefaults.cardColors(containerColor = whiteColor),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(20.dp)) {
                     Text(
                         text = "Outfits Calendar",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = primaryColor
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Today, ${getCurrentDate()}",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        fontSize = 20.sp,
+                        color = textColor
                     )
                 }
             }
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "My Outfits",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Row {
-                    IconButton(onClick = onWardrobeClick) {
-                        Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_add),
-                            contentDescription = "Add Outfit",
-                            modifier = Modifier.size(28.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(onClick = onCameraClick) {
-                        Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_camera),
-                            contentDescription = "Take Photo",
-                            modifier = Modifier.size(28.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(onClick = onGalleryClick) {
-                        Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-                            contentDescription = "Upload Photo",
-                            modifier = Modifier.size(28.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(onClick = onMarketplaceClick) {
-                        Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_slideshow),
-                            contentDescription = "Marketplace",
-                            modifier = Modifier.size(28.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp)
-            ) {
-                items(clothingImages.size) { index ->
-                    val (path, prediction) = clothingImages[index]
-                    OutfitCard(
-                        imageSource = path,
-                        prediction = prediction,
-                        onDeleteClick = { showDeleteDialog = path }
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "My Outfits",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
                     )
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        IconButton(onClick = onWardrobeClick) {
+                            Icon(
+                                painter = painterResource(id = android.R.drawable.ic_menu_add),
+                                contentDescription = "Add Outfit",
+                                modifier = Modifier.size(36.dp),
+                                tint = primaryColor
+                            )
+                        }
+                        IconButton(onClick = onCameraClick) {
+                            Icon(
+                                painter = painterResource(id = android.R.drawable.ic_menu_camera),
+                                contentDescription = "Take Photo",
+                                modifier = Modifier.size(36.dp),
+                                tint = primaryColor
+                            )
+                        }
+                        IconButton(onClick = onGalleryClick) {
+                            Icon(
+                                painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                                contentDescription = "Upload Photo",
+                                modifier = Modifier.size(36.dp),
+                                tint = primaryColor
+                            )
+                        }
+                        IconButton(onClick = onMarketplaceClick) {
+                            Icon(
+                                painter = painterResource(id = android.R.drawable.ic_menu_slideshow),
+                                contentDescription = "Marketplace",
+                                modifier = Modifier.size(36.dp),
+                                tint = primaryColor
+                            )
+                        }
+                    }
                 }
-                if (clothingImages.isEmpty()) {
-                    item {
+                Spacer(modifier = Modifier.height(20.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    items(clothingImages.size) { index ->
+                        val (path, prediction) = clothingImages[index]
                         OutfitCard(
-                            imageSource = "No Items",
-                            prediction = "Unknown",
-                            onDeleteClick = {}
+                            imageSource = path,
+                            prediction = prediction,
+                            onDeleteClick = { showDeleteDialog = path },
+                            primaryColor = primaryColor,
+                            textColor = textColor,
+                            secondaryColor = secondaryColor,
+                            whiteColor = whiteColor
                         )
+                    }
+                    if (clothingImages.isEmpty()) {
+                        item {
+                            OutfitCard(
+                                imageSource = "No Items",
+                                prediction = "Unknown",
+                                onDeleteClick = {},
+                                primaryColor = primaryColor,
+                                textColor = textColor,
+                                secondaryColor = secondaryColor,
+                                whiteColor = whiteColor
+                            )
+                        }
                     }
                 }
             }
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Column {
                 Text(
                     text = "Recommendations",
-                    fontSize = 26.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = primaryColor,
+                    modifier = Modifier.padding(bottom = 20.dp)
                 )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = { onRecommendationClick("Casual", if (isMale) "Men" else "Women") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("Casual", color = Color.White)
-                }
-                Button(
-                    onClick = { onRecommendationClick("Formal", if (isMale) "Women" else "Men") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("Formal", color = Color.White)
-                }
-                Button(
-                    onClick = { onRecommendationClick("Sporty", if (isMale) "Men" else "Women") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("Sporty", color = Color.White)
+                    Button(
+                        onClick = { onRecommendationClick("Casual", if (isMale) "Men" else "Women") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor, contentColor = whiteColor),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Casual", fontSize = 16.sp)
+                    }
+                    Button(
+                        onClick = { onRecommendationClick("Formal", if (isMale) "Women" else "Men") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor, contentColor = whiteColor),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Formal", fontSize = 16.sp)
+                    }
+                    Button(
+                        onClick = { onRecommendationClick("Sporty", if (isMale) "Men" else "Women") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor, contentColor = whiteColor),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Sporty", fontSize = 16.sp)
+                    }
                 }
             }
         }
@@ -524,24 +552,27 @@ fun HomeScreen(
 fun OutfitCard(
     imageSource: String,
     prediction: String,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    primaryColor: Color,
+    textColor: Color,
+    secondaryColor: Color,
+    whiteColor: Color
 ) {
     Card(
         modifier = Modifier
-            .width(120.dp)
-            .height(150.dp)
-            .clip(RoundedCornerShape(12.dp)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .width(140.dp)
+            .height(180.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = whiteColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp)
+                    .padding(12.dp)
             ) {
                 val context = LocalContext.current
                 val imageUrl = "http://10.0.2.2:4000/api/images/$imageSource"
@@ -557,68 +588,48 @@ fun OutfitCard(
                                 addHeader("Authorization", "Bearer $token")
                             }
                         }
-                        .listener(
-                            onError = { _, result ->
-                                Log.e("OutfitCard", "Failed to load image $imageUrl: ${result.throwable.message}")
-                            },
-                            onSuccess = { _, _ ->
-                                Log.d("OutfitCard", "Successfully loaded image $imageUrl")
-                            }
-                        )
                         .build()
                 )
                 Image(
                     painter = painter,
                     contentDescription = prediction,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(100.dp)
                         .clip(RoundedCornerShape(8.dp))
+                        .border(2.dp, secondaryColor, RoundedCornerShape(8.dp))
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = prediction,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp,
+                    color = textColor,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Medium
                 )
             }
             IconButton(
                 onClick = { onDeleteClick(imageSource) },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(4.dp)
-                    .size(24.dp)
+                    .padding(8.dp)
+                    .size(28.dp)
+                    .border(1.dp, primaryColor, RoundedCornerShape(50))
             ) {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                     contentDescription = "Delete Image",
-                    tint = Color.Red
+                    tint = primaryColor
                 )
             }
         }
     }
 }
 
+// Function to get the current date
 fun getCurrentDate(): String {
     val calendar = Calendar.getInstance()
     val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     val day = calendar.get(Calendar.DAY_OF_MONTH)
     return "Today, $day $month"
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    OutfitAura2Theme {
-        HomeScreen(
-            onWardrobeClick = {},
-            onCameraClick = {},
-            onGalleryClick = {},
-            clothingImages = listOf(Pair("path", "t-shirt"), Pair("path2", "jeans")),
-            onRecommendationClick = { _, _ -> },
-            onDeleteImage = {},
-            onMarketplaceClick = {}
-        )
-    }
 }
