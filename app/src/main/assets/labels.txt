@@ -1,0 +1,16 @@
+0 shirt
+1 shorts
+2 shoes
+3 t-shirt
+4 pants
+5 sneakers
+6 athleisure-women
+7 athleisure-men
+8 suit-men
+9 suit-women
+10 skirt
+11 outwear
+12 longsleeve
+13 hat
+14 dress
+15 Hoodie

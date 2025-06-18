@@ -1,9 +1,12 @@
 package tn.esprit.outfitaura2.models
 
-import tn.esprit.outfitaura2.network.User
-
-
 data class LoginResponse(
     val success: Boolean,
-    val user: User?
+    val token: String?,
+    val user: User?,
+    val error: String?
+)
+
+data class User(
+    val email: String
 )

@@ -38,4 +38,7 @@ class HomeViewModel : ViewModel() {
     fun setStyleFromActivity(style: String) {
         _selectedStyle.value = style
     }
+
+
 }
+

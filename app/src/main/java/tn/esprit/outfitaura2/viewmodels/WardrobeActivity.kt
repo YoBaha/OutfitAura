@@ -1,129 +1,269 @@
 package tn.esprit.outfitaura2.viewmodels
 
-import tn.esprit.outfitaura2.ui.theme.StyleButton
-import tn.esprit.outfitaura2.ui.theme.ImageGrid
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.unit.dp
-import tn.esprit.outfitaura2.R
-import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import tn.esprit.outfitaura2.LoginActivity
+import tn.esprit.outfitaura2.models.DeleteResponse
+import tn.esprit.outfitaura2.network.ApiClient
+import tn.esprit.outfitaura2.network.OnUnauthorizedCallback
 import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import android.util.Base64
 
 class WardrobeActivity : ComponentActivity() {
-
-    private val homeViewModel: HomeViewModel by viewModels()
-    private val imageList = mutableListOf<Pair<Bitmap, String>>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
-        // Get the base64 image string from the Intent
-        val base64Image = intent.getStringExtra("image")
-        base64Image?.let {
-            val bitmap = convertBase64ToBitmap(it)
-            imageList.add(Pair(bitmap, "Uploaded Image"))
-            // Add the image to the ViewModel's list of images
-            homeViewModel.addImage(bitmap, "Uploaded Image")
-        }
+        val clothingImageIds = intent.getStringArrayListExtra("clothingImageIds") ?: arrayListOf()
+        val clothingPredictions = intent.getStringArrayListExtra("clothingPredictions") ?: arrayListOf()
+        val clothingImages = clothingImageIds.zip(clothingPredictions).map { Pair(it.first, it.second) }
 
         setContent {
-            // Observe the selected style from the HomeViewModel
-            val selectedStyle by homeViewModel.selectedStyle.collectAsState()
-
             OutfitAura2Theme {
-                Scaffold(
-                    bottomBar = {
-                        BottomAppBar {
-                            // Add navigation buttons if needed
-                        }
-                    },
-                    content = { paddingValues ->
-                        Column(
-                            modifier = Modifier
-                                .padding(paddingValues)
-                        ) {
-                            // Style buttons to allow style selection
-                            StyleButton("Athleisure", "athleisure") { homeViewModel.updateStyle(it) }
-                            StyleButton("Casual Wear", "casual wear") { homeViewModel.updateStyle(it) }
-                            StyleButton("Formal Wear", "formal wear") { homeViewModel.updateStyle(it) }
-                            StyleButton("Winter Wear", "winter wear") { homeViewModel.updateStyle(it) }
-
-                            // Filter images by selected style using the getImagesByStyle method
-                            val filteredImages = homeViewModel.getImagesByStyle(selectedStyle)
-
-                            // Display the filtered images using WardrobeScreen
-                            WardrobeScreen(filteredImages)
-                        }
+                val clothingImagesState = remember { mutableStateOf(clothingImages) }
+                WardrobeScreen(
+                    clothingImages = clothingImagesState.value,
+                    onBackClick = { finish() },
+                    onDeleteClick = { imageId ->
+                        clothingImagesState.value = clothingImagesState.value.filter { it.first != imageId }
                     }
                 )
             }
         }
     }
-
-    // Function to convert Base64 string to Bitmap
-    fun convertBase64ToBitmap(base64String: String): Bitmap {
-        val decodedString = Base64.decode(base64String, Base64.DEFAULT)
-        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-    }
 }
 
 @Composable
-fun WardrobeScreen(imageList: List<Pair<Bitmap, String>>) {
-    var selectedStyle by remember { mutableStateOf("") } // Track selected style for filtering
+fun WardrobeScreen(
+    clothingImages: List<Pair<String, String>>,
+    onBackClick: () -> Unit,
+    onDeleteClick: (String) -> Unit
+) {
+    var showDeleteDialog by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
-    Box(
-        modifier = Modifier.fillMaxSize()
+    fun deleteImage(imageId: String) {
+        val call = ApiClient.getImageService(context).deleteImage(imageId)
+        ApiClient.tagCall(call, context, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            (ctx as? ComponentActivity)?.finish()
+        }).enqueue(object : Callback<DeleteResponse> {
+            override fun onResponse(call: Call<DeleteResponse>, response: Response<DeleteResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { deleteResponse ->
+                        if (deleteResponse.success) {
+                            onDeleteClick(imageId)
+                            Log.d("WardrobeScreen", "Image deleted: $imageId")
+                            Toast.makeText(context, "Image deleted successfully", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.e("WardrobeScreen", "Delete failed: ${deleteResponse.error}")
+                            Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Log.e("WardrobeScreen", "Delete failed: ${response.errorBody()?.string()}")
+                    Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<DeleteResponse>, t: Throwable) {
+                Log.e("WardrobeScreen", "Delete failed: ${t.message}")
+                Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    showDeleteDialog?.let { imageId ->
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = null },
+            title = { Text("Delete Image") },
+            text = { Text("Are you sure you want to permanently delete this image?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        deleteImage(imageId)
+                        showDeleteDialog = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Delete", color = Color.White)
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_menu_revert),
+                    contentDescription = "Back",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Text(
+                text = "My Wardrobe",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Add your StyleButton composables here (similar to HomeActivity)
-            item {
-                StyleButton("Athleisure", "athleisure") { selectedStyle = it }
+            items(clothingImages.size) { index ->
+                val (imageId, prediction) = clothingImages[index]
+                if (imageId.isEmpty()) {
+                    Log.w("WardrobeScreen", "Skipping empty imageId for prediction: $prediction")
+                    return@items
+                }
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(120.dp)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp)
+                    ) {
+                        val imageUrl = "http://10.0.2.2:4000/api/images/$imageId"
+                        val context = LocalContext.current
+                        val token = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+                            .getString("jwt_token", null)
+                        val painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(context)
+                                .data(imageUrl)
+                                .error(android.R.drawable.ic_menu_gallery)
+                                .placeholder(android.R.drawable.ic_menu_gallery)
+                                .apply {
+                                    if (token != null) {
+                                        addHeader("Authorization", "Bearer $token")
+                                    }
+                                }
+                                .listener(
+                                    onError = { _, result ->
+                                        Log.e("WardrobeScreen", "Failed to load image $imageUrl: ${result.throwable.message}")
+                                    },
+                                    onSuccess = { _, _ ->
+                                        Log.d("WardrobeScreen", "Successfully loaded image $imageUrl")
+                                    }
+                                )
+                                .build()
+                        )
+                        Image(
+                            painter = painter,
+                            contentDescription = "Clothing Item",
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .size(80.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Type: $prediction",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(
+                        onClick = { showDeleteDialog = imageId },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                            .size(20.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
+                            contentDescription = "Delete Image",
+                            tint = Color.Red,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
-            item {
-                StyleButton("Casual Wear", "casual wear") { selectedStyle = it }
-            }
-            item {
-                StyleButton("Formal Wear", "formal wear") { selectedStyle = it }
-            }
-            item {
-                StyleButton("Winter Wear", "winter wear") { selectedStyle = it }
-            }
-
-            // Filter and display images based on selected style
-            val filteredImages = imageList.filter { pair ->
-                selectedStyle.isEmpty() || pair.second.contains(selectedStyle, ignoreCase = true)
-            }
-            item {
-                ImageGrid(filteredImages)
-            }
-
-            // Add spacing at the bottom to avoid overlapping with BottomAppBar
-            item {
-                Spacer(modifier = Modifier.height(72.dp))
+            if (clothingImages.isEmpty()) {
+                items(4) {
+                    Column(
+                        modifier = Modifier
+                            .width(120.dp)
+                            .height(120.dp)
+                            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                            contentDescription = "Placeholder",
+                            modifier = Modifier.size(80.dp)
+                        )
+                    }
+                }
             }
         }
+    }
+}
 
-        // Bottom Navigation Bar (same as in HomeActivity)
+@Preview(showBackground = true)
+@Composable
+fun WardrobeScreenPreview() {
+    OutfitAura2Theme {
+        WardrobeScreen(
+            clothingImages = listOf(Pair("id", "t-shirt")),
+            onBackClick = {},
+            onDeleteClick = {}
+        )
     }
 }

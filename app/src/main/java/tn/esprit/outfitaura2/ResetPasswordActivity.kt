@@ -13,17 +13,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import tn.esprit.outfitaura2.models.ResetPasswordRequest
+import tn.esprit.outfitaura2.models.ResetPasswordResponse
+import tn.esprit.outfitaura2.network.ApiClient
 import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
 
-class ForgotPasswordActivity : ComponentActivity() {
+class ResetPasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val token = intent.getStringExtra("token") ?: ""
         setContent {
             OutfitAura2Theme {
-                ForgotPasswordScreen(
-                    onSubmit = { email -> submitForgotPassword(email) },
+                ResetPasswordScreen(
+                    token = token,
+                    onSubmit = { password -> submitResetPassword(token, password) },
                     showToast = { message -> showToast(message) },
                     onBackToLogin = { navigateToLoginActivity() }
                 )
@@ -31,46 +40,32 @@ class ForgotPasswordActivity : ComponentActivity() {
         }
     }
 
-    private fun submitForgotPassword(email: String) {
-        if (email.isEmpty()) {
-            showToast("Please enter your email")
+    private fun submitResetPassword(token: String, password: String) {
+        if (password.isEmpty()) {
+            showToast("Please enter a new password")
             return
         }
-        // TODO: Implement forgot password functionality later
-        showToast("Forgot password not implemented yet")
-        /*
-        val request = ForgotPasswordRequest(email)
-        val call = ApiClient.getAuthService(this).forgotPassword(request)
-        call.request().newBuilder()
-            .tag(this)
-            .tag(OnUnauthorizedCallback { ctx ->
-                ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
-                ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-                (ctx as? ComponentActivity)?.finish()
-            })
-            .build()
-        call.enqueue(object : Callback<ForgotPasswordResponse> {
-            override fun onResponse(call: Call<ForgotPasswordResponse>, response: Response<ForgotPasswordResponse>) {
+
+        val request = ResetPasswordRequest(password)
+        ApiClient.getAuthService(this).resetPassword(token, request).enqueue(object : Callback<ResetPasswordResponse> {
+            override fun onResponse(call: Call<ResetPasswordResponse>, response: Response<ResetPasswordResponse>) {
                 if (response.isSuccessful) {
-                    val forgotResponse = response.body()
-                    if (forgotResponse?.success == true) { // Error here
-                        showToast(forgotResponse.message ?: "Password reset email sent")
+                    val resetResponse = response.body()
+                    if (resetResponse?.success == true) {
+                        showToast(resetResponse.message ?: "Password reset successfully")
                         navigateToLoginActivity()
                     } else {
-                        showToast(forgotResponse?.error ?: "Failed to send reset email")
+                        showToast(resetResponse?.error ?: "Error resetting password")
                     }
                 } else {
                     showToast("Error: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ForgotPasswordResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ResetPasswordResponse>, t: Throwable) {
                 showToast("Network error: ${t.message}")
             }
         })
-        */
     }
 
     private fun navigateToLoginActivity() {
@@ -85,12 +80,13 @@ class ForgotPasswordActivity : ComponentActivity() {
 }
 
 @Composable
-fun ForgotPasswordScreen(
+fun ResetPasswordScreen(
+    token: String,
     onSubmit: (String) -> Unit,
     showToast: (String) -> Unit,
     onBackToLogin: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     Column(
@@ -101,18 +97,19 @@ fun ForgotPasswordScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Forgot Password",
+            text = "Reset Password",
             style = MaterialTheme.typography.headlineMedium
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("New Password") },
+            visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
+                keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
             modifier = Modifier.fillMaxWidth()
@@ -122,13 +119,12 @@ fun ForgotPasswordScreen(
 
         Button(
             onClick = {
-                if (email.isEmpty()) {
-                    showToast("Please enter your email")
+                if (password.isEmpty()) {
+                    showToast("Please enter a new password")
                     return@Button
                 }
                 isLoading = true
-                onSubmit(email)
-                isLoading = false // Reset loading state for placeholder
+                onSubmit(password)
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
@@ -136,7 +132,7 @@ fun ForgotPasswordScreen(
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
             } else {
-                Text("Submit")
+                Text("Reset Password")
             }
         }
 
@@ -150,8 +146,13 @@ fun ForgotPasswordScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun ForgotPasswordScreenPreview() {
+fun ResetPasswordScreenPreview() {
     OutfitAura2Theme {
-        ForgotPasswordScreen(onSubmit = {}, showToast = {}, onBackToLogin = {})
+        ResetPasswordScreen(
+            token = "",
+            onSubmit = {},
+            showToast = {},
+            onBackToLogin = {}
+        )
     }
 }

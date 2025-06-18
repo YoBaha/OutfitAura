@@ -1,89 +1,103 @@
 package tn.esprit.outfitaura2
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import tn.esprit.outfitaura2.network.ApiClient
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import tn.esprit.outfitaura2.models.LoginRequest
 import tn.esprit.outfitaura2.models.LoginResponse
-import tn.esprit.outfitaura2.network.User
-import tn.esprit.outfitaura2.ui.theme.WhiteColor
-import tn.esprit.outfitaura2.view.SessionManager
+import tn.esprit.outfitaura2.network.ApiClient
+import tn.esprit.outfitaura2.network.OnUnauthorizedCallback
+import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
 import tn.esprit.outfitaura2.viewmodels.HomeActivity
-import androidx.compose.material3.TextFieldDefaults
-
 
 class LoginActivity : ComponentActivity() {
-
-    private lateinit var sessionManager: SessionManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sessionManager = SessionManager(this)  // Initialize session manager
-
         setContent {
             OutfitAura2Theme {
-                LoginScreen(
-                    onLoginClick = { email, password -> loginUser(email, password) },
+                var email by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+                var isLoading by remember { mutableStateOf(false) }
+
+                LoginUI(
+                    email = email,
+                    onEmailChange = { email = it },
+                    password = password,
+                    onPasswordChange = { password = it },
+                    isLoading = isLoading,
+                    onLoginClick = { email, password ->
+                        isLoading = true
+                        loginUser(email, password) { success ->
+                            isLoading = false
+                            if (success) navigateToHomeActivity()
+                        }
+                    },
                     showToast = { message -> showToast(message) },
-                    onSignUpClick = { navigateToSignUpActivity() },
-                    onForgotPasswordClick = { navigateToForgotPasswordActivity() }
+                    navigateToSignUp = { navigateToSignUpActivity() },
+                    navigateToForgotPassword = { navigateToForgotPasswordActivity() }
                 )
             }
         }
     }
 
-    private fun loginUser(email: String, password: String) {
+    private fun loginUser(email: String, password: String, onComplete: (Boolean) -> Unit) {
         if (email.isEmpty() || password.isEmpty()) {
             showToast("Please enter both email and password")
+            onComplete(false)
             return
         }
 
         val loginRequest = LoginRequest(email, password)
-
-        ApiClient.authService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
+        val call = ApiClient.getAuthService(this).login(loginRequest)
+        ApiClient.tagCall(call, this, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            showToast("Session expired. Please log in again.")
+            // Already in LoginActivity, so no need to navigate
+        }).enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
                     if (loginResponse?.success == true) {
-                        val user = User(email)  // Assuming login response contains user ID
-                        sessionManager.saveUser(user)  // Save user session
+                        getSharedPreferences("auth_prefs", MODE_PRIVATE)
+                            .edit()
+                            .putString("jwt_token", loginResponse.token)
+                            .apply()
                         showToast("Login Successful")
-                        navigateToHomeActivity()
+                        onComplete(true)
                     } else {
-                        showToast("Invalid login credentials")
+                        showToast(loginResponse?.error ?: "Invalid credentials")
+                        onComplete(false)
                     }
                 } else {
                     showToast("Error: ${response.message()}")
+                    onComplete(false)
                 }
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 showToast("Network error: ${t.message}")
+                onComplete(false)
             }
         })
     }
@@ -109,134 +123,114 @@ class LoginActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
-fun LoginScreen(
+fun LoginUI(
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    isLoading: Boolean,
     onLoginClick: (String, String) -> Unit,
     showToast: (String) -> Unit,
-    onSignUpClick: () -> Unit,
-    onForgotPasswordClick: () -> Unit
+    navigateToSignUp: () -> Unit,
+    navigateToForgotPassword: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black) // Set the background color to black
+            .background(Color.Black)
     ) {
-        // Your background image code can remain the same
         Image(
             painter = painterResource(id = R.drawable.bg3),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    painter = painterResource(id = R.drawable.a),
-                    contentDescription = "App Logo",
-                    modifier = Modifier.size(300.dp)
+            Image(
+                painter = painterResource(id = R.drawable.a),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(250.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Log In",
+                style = MaterialTheme.typography.headlineLarge,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = { Text("Email", color = Color.White) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Color.White
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Log In",
-                    style = MaterialTheme.typography.headlineLarge.copy(color = Color.White)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                label = { Text("Password", color = Color.White) },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Color.White
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Replacing OutlinedTextField with TextField
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email", color = Color.White) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, Color.White), // Custom border color
-                    textStyle = TextStyle(color = Color.White)
-                )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Replacing OutlinedTextField with TextField
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password", color = Color.White) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, Color.White), // Custom border color
-                    textStyle = TextStyle(color = Color.White)
-                )
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Button(
-                    onClick = {
-                        if (email.isEmpty() || password.isEmpty()) {
-                            showToast("Please enter both email and password")
-                            return@Button
-                        }
-                        isLoading = true
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    if (!isLoading) {
                         onLoginClick(email, password)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(18.dp))
-                    } else {
-                        Text("Log In", color = Color.Black)
                     }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                ),
+                enabled = !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.Black
+                    )
+                } else {
+                    Text("Log In")
                 }
             }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "You don't have an account yet?",
-                    color = Color.White,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                TextButton(onClick = { onSignUpClick() }) {
-                    Text("Sign Up", color = Color.Black)
-                }
-
-                TextButton(onClick = { onForgotPasswordClick() }) {
-                    Text("Forgot Password?", color = Color.Black)
-                }
+            Spacer(modifier = Modifier.height(16.dp))
+            TextButton(onClick = navigateToSignUp) {
+                Text("Don't have an account? Sign Up", color = Color.White)
+            }
+            TextButton(onClick = navigateToForgotPassword) {
+                Text("Forgot Password?", color = Color.White)
             }
         }
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    OutfitAura2Theme {
-        LoginScreen(onLoginClick = { _, _ -> }, showToast = {}, onSignUpClick = {}, onForgotPasswordClick = {})
     }
 }

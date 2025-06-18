@@ -5,373 +5,515 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import tn.esprit.outfitaura2.R
-import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
-import java.io.File
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat.startActivity
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import tn.esprit.outfitaura2.LoginActivity
-import tn.esprit.outfitaura2.view.SessionManager
-import android.util.Base64
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import tn.esprit.outfitaura2.view.StyleRecommendationsActivity
-import java.io.ByteArrayOutputStream
-import tn.esprit.outfitaura2.viewmodels.WeatherService
-
+import tn.esprit.outfitaura2.viewmodels.MarketplaceActivity
+import tn.esprit.outfitaura2.models.DeleteResponse
+import tn.esprit.outfitaura2.models.UserImagesResponse
+import tn.esprit.outfitaura2.models.UploadResponse
+import tn.esprit.outfitaura2.network.ApiClient
+import tn.esprit.outfitaura2.network.OnUnauthorizedCallback
+import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
+import tn.esprit.outfitaura2.viewmodels.ClothingClassifier
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomeActivity : ComponentActivity() {
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val photoUri = currentPhotoUri
+            photoUri?.let { uri ->
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                saveImage(bitmap, "camera_${System.currentTimeMillis()}.jpg")
+            }
+        }
+    }
 
-    private val homeViewModel: HomeViewModel by viewModels()
-    private lateinit var weatherApiClient: WeatherApiClient
-    private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
-    private lateinit var galleryLauncher: ActivityResultLauncher<String>
-    private lateinit var photoUri: Uri
-    private lateinit var clothingClassifier: ClothingClassifier
-    private lateinit var styleClassifier: StyleClassifier
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { saveImageUri(it, "gallery_${System.currentTimeMillis()}.jpg") }
+    }
 
-    private val clothingLabels = listOf(
-        "dress", "hat", "hoodie", "longsleeve", "outerwear",
-        "pants", "shirt", "shoes", "shorts", "skirt", "t-shirt"
-    )
+    private var clothingImages by mutableStateOf<List<Pair<String, String>>>(emptyList())
+    private var currentPhotoUri by mutableStateOf<Uri?>(null)
+    private lateinit var classifier: ClothingClassifier
 
-    private val styleLabels = listOf(
-        "athleisure", "casual wear", "formal wear", "winter wear"
-    )
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (allGranted) {
+            openCameraWithPermission()
+        } else {
+            Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize the WeatherApiClient
-        weatherApiClient = WeatherApiClient()
-
-        // Initialize classifiers
-        clothingClassifier = ClothingClassifier("clothing_model.tflite", assets)
-        styleClassifier = StyleClassifier("clothing_style.tflite", assets)
-
-        cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success) processCapturedPhoto()
-            else showToast("Photo capture failed.")
-        }
-
-        galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let { processSelectedPhoto(it) }
-        }
-
+        enableEdgeToEdge()
+        classifier = ClothingClassifier("model_unquant.tflite", assets)
+        fetchUserImages()
         setContent {
             OutfitAura2Theme {
-                val imageList by homeViewModel.imageList.collectAsState()
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    HomeScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        onWardrobeClick = { navigateToWardrobe() },
+                        onCameraClick = { requestCameraPermission() },
+                        onGalleryClick = { openGallery() },
+                        clothingImages = clothingImages,
+                        onRecommendationClick = { type, gender -> navigateToRecommendation(type, gender) },
+                        onDeleteImage = { imageId ->
+                            clothingImages = clothingImages.filter { it.first != imageId }
+                        },
+                        onMarketplaceClick = { startActivity(Intent(this, MarketplaceActivity::class.java)) }
+                    )
+                }
+            }
+        }
+    }
 
-                HomeScreen(
-                    onCameraClick = { checkCameraPermission() },
-                    onGalleryClick = { openGallery() },
-                    imageList = imageList,
-                    onAddImage = { bitmap, label ->
-                        homeViewModel.addImage(bitmap, label)
+    private fun fetchUserImages() {
+        val token = getSharedPreferences("auth_prefs", MODE_PRIVATE)
+            .getString("jwt_token", null)
+        Log.d("HomeActivity", "Fetching images with token: ${token?.take(10) ?: "null"}...")
+        val call = ApiClient.getImageService(this).getUserImages()
+        ApiClient.tagCall(call, this, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            (ctx as? ComponentActivity)?.finish()
+        }).enqueue(object : Callback<UserImagesResponse> {
+            override fun onResponse(call: Call<UserImagesResponse>, response: Response<UserImagesResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { userImages ->
+                        if (userImages.success) {
+                            clothingImages = userImages.images.map { Pair(it.id, it.prediction) }
+                            Log.d("HomeActivity", "Fetched images: $clothingImages")
+                        } else {
+                            Log.e("HomeActivity", "Failed to fetch images: ${userImages.error}")
+                            Toast.makeText(this@HomeActivity, "Failed to fetch images", Toast.LENGTH_SHORT).show()
+                        }
                     }
-                )
+                } else {
+                    Log.e("HomeActivity", "Fetch images failed: ${response.errorBody()?.string()}")
+                    Toast.makeText(this@HomeActivity, "Failed to fetch images", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<UserImagesResponse>, t: Throwable) {
+                Log.e("HomeActivity", "Fetch images failed: ${t.message}")
+                Toast.makeText(this@HomeActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun navigateToWardrobe() {
+        Log.d("HomeActivity", "Navigating to WardrobeActivity with clothingImages: $clothingImages")
+        val intent = Intent(this, WardrobeActivity::class.java).apply {
+            putStringArrayListExtra("clothingImageIds", ArrayList(clothingImages.map { it.first }))
+            putStringArrayListExtra("clothingPredictions", ArrayList(clothingImages.map { it.second }))
+        }
+        startActivity(intent)
+    }
+
+    private fun navigateToRecommendation(type: String, gender: String) {
+        Log.d("HomeActivity", "Navigating to RecommendationActivity with type: $type, gender: $gender")
+        val intent = Intent(this, RecommendationActivity::class.java).apply {
+            putStringArrayListExtra("clothingImageIds", ArrayList(clothingImages.map { it.first }))
+            putStringArrayListExtra("clothingPredictions", ArrayList(clothingImages.map { it.second }))
+            putExtra("recommendationType", type)
+            putExtra("gender", gender)
+        }
+        startActivity(intent)
+    }
+
+    private fun requestCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> {
+                openCameraWithPermission()
+            }
+            else -> {
+                permissionLauncher.launch(arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ))
             }
         }
-
-        // Fetch weather data
-        getWeatherData("London", "your_api_key")
     }
 
-    private fun getWeatherData(city: String, apiKey: String) {
-        weatherApiClient.getWeather(city, apiKey,
-            onSuccess = { weatherResponse ->
-                val temperature = weatherResponse.main.temp
-                val description = weatherResponse.weather.firstOrNull()?.description
-                showWeatherInfo(temperature, description)
-            },
-            onError = { errorMessage ->
-                showToast("Error: $errorMessage")
-            }
-        )
-    }
-
-    private fun showWeatherInfo(temperature: Float, description: String?) {
-        val weatherInfo = "Temp: $temperature°C, Description: $description"
-        // Show weather info on top of the screen
-        showToast(weatherInfo)
-    }
-
-    private fun checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            openCamera()
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERMISSION_CODE
-            )
+    private fun openCameraWithPermission() {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val photoFile = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+        currentPhotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, currentPhotoUri)
         }
-    }
-
-    private fun openCamera() {
-        val tempFile = File.createTempFile("photo_", ".jpg", cacheDir).apply {
-            deleteOnExit()
+        if (cameraIntent.resolveActivity(packageManager) != null) {
+            cameraLauncher.launch(cameraIntent)
         }
-        photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", tempFile)
-        cameraLauncher.launch(photoUri)
     }
 
     private fun openGallery() {
         galleryLauncher.launch("image/*")
     }
 
-    private fun processCapturedPhoto() {
-        contentResolver.openInputStream(photoUri)?.use { inputStream ->
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            classifyAndStore(bitmap)
+    private fun saveImage(bitmap: Bitmap, fileName: String) {
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val imageFile = File(storageDir, fileName)
+        if (!imageFile.exists()) {
+            FileOutputStream(imageFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
+            val prediction = classifier.classify(bitmap)
+            uploadImageToServer(imageFile, prediction)
         }
     }
 
-    private fun processSelectedPhoto(uri: Uri) {
-        contentResolver.openInputStream(uri)?.use { inputStream ->
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            classifyAndStore(bitmap)
+    private fun saveImageUri(uri: Uri, fileName: String) {
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val imageFile = File(storageDir, fileName)
+        if (!imageFile.exists()) {
+            val inputStream = contentResolver.openInputStream(uri)
+            inputStream?.use { input ->
+                FileOutputStream(imageFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            val prediction = classifier.classify(bitmap)
+            uploadImageToServer(imageFile, prediction)
         }
     }
 
-    private fun classifyAndStore(bitmap: Bitmap) {
-        // Predict clothing item
-        val clothingIndex = clothingClassifier.classify(bitmap)
-        val clothingLabel = clothingLabels.getOrElse(clothingIndex) { "Unknown" }
+    private fun uploadImageToServer(file: File, prediction: String) {
+        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val imagePart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+        val predictionPart = okhttp3.RequestBody.create("text/plain".toMediaTypeOrNull(), prediction)
 
-        // Predict clothing style
-        val styleIndex = styleClassifier.classify(bitmap)
-        val styleLabel = styleLabels.getOrElse(styleIndex) { "Unknown" }
-
-        showToast("Clothing: $clothingLabel, Style: $styleLabel")
-        homeViewModel.addImage(bitmap, "$clothingLabel, $styleLabel")
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-    companion object {
-        const val CAMERA_PERMISSION_CODE = 1001
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(
-    onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit,
-    imageList: List<Pair<Bitmap, String>>,
-    onAddImage: (Bitmap, String) -> Unit
-) {
-    val gradient = Brush.verticalGradient(
-        colors = listOf(Color.White, Color(0xFFDCDCDC)) // White to grey gradient
-    )
-
-    var searchText by remember { mutableStateOf("") }
-    var selectedStyle by remember { mutableStateOf("")} // Track selected style
-    val weatherInfo = remember { mutableStateOf("")}
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradient)
-    ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Search Box
-            item {
-                TextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    placeholder = { Text("Search...") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = Color.Gray,
-                        unfocusedIndicatorColor = Color.LightGray,
-                        cursorColor = Color.Gray,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Gray
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                )
-            }
-
-            // Add Buttons for Style Selection
-            item {
-                StyleButton("Athleisure", "athleisure") { selectedStyle = it }
-            }
-            item {
-                StyleButton("Casual Wear", "casual wear") { selectedStyle = it }
-            }
-            item {
-                StyleButton("Formal Wear", "formal wear") { selectedStyle = it }
-            }
-            item {
-                StyleButton("Winter Wear", "winter wear") { selectedStyle = it }
-            }
-
-            // Marketing Cards (Now Just Images with Text)
-            item {
-                MarketingCard(
-                    imageResId = R.drawable.card,
-                    text = "Discover our latest features and tools!"
-                )
-            }
-
-            item {
-                MarketingCard(
-                    imageResId = R.drawable.card2,
-                    text = "Explore new possibilities with our services!"
-                )
-            }
-
-            // Image Grid Section
-            val filteredImages = imageList.filter { pair ->
-                selectedStyle.isEmpty() || pair.second.contains(selectedStyle, ignoreCase = true)
-            }
-
-            if (filteredImages.isNotEmpty()) {
-                item {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 150.dp), // Make grid adaptive
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .heightIn(max = 400.dp)
-                    ) {
-                        items(filteredImages) { pair ->
-                            val (image, prediction) = pair
-                            Column(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Image(
-                                    bitmap = image.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(280.dp)
-                                        .padding(4.dp),
-                                    contentScale = ContentScale.Crop
-                                )
-                                Text(
-                                    text = prediction,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(top = 4.dp)
-                                )
-                            }
-                        }
+        val call = ApiClient.getImageService(this).uploadImage(imagePart, predictionPart)
+        ApiClient.tagCall(call, this, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            (ctx as? ComponentActivity)?.finish()
+        }).enqueue(object : Callback<UploadResponse> {
+            override fun onResponse(call: Call<UploadResponse>, response: Response<UploadResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { uploadResponse ->
+                        Log.d("HomeActivity", "Image uploaded with ID: ${uploadResponse.id}, Prediction: $prediction")
+                        fetchUserImages()
                     }
+                } else {
+                    Log.e("HomeActivity", "Upload failed: ${response.errorBody()?.string()}")
+                    Toast.makeText(this@HomeActivity, "Upload failed", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            // Add spacing at the bottom to avoid overlapping with BottomAppBar
-            item {
-                Spacer(modifier = Modifier.height(72.dp))
+            override fun onFailure(call: Call<UploadResponse>, t: Throwable) {
+                Log.e("HomeActivity", "Upload failed: ${t.message}")
+                Toast.makeText(this@HomeActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
-        }
+        })
+    }
+}
 
-        // Bottom Navigation Bar
-        BottomAppBar(
-            containerColor = Color.Black,
-            contentColor = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onWardrobeClick: () -> Unit,
+    onCameraClick: () -> Unit,
+    onGalleryClick: () -> Unit,
+    clothingImages: List<Pair<String, String>>,
+    onRecommendationClick: (String, String) -> Unit,
+    onDeleteImage: (String) -> Unit,
+    onMarketplaceClick: () -> Unit
+) {
+    var isMale by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    var showDeleteDialog by remember { mutableStateOf<String?>(null) }
+
+    fun deleteImage(imageId: String) {
+        val call = ApiClient.getImageService(context).deleteImage(imageId)
+        ApiClient.tagCall(call, context, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            ctx.startActivity(Intent(ctx, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            (ctx as? ComponentActivity)?.finish()
+        }).enqueue(object : Callback<DeleteResponse> {
+            override fun onResponse(call: Call<DeleteResponse>, response: Response<DeleteResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { deleteResponse ->
+                        if (deleteResponse.success) {
+                            onDeleteImage(imageId)
+                            Log.d("HomeActivity", "Image deleted: $imageId")
+                            Toast.makeText(context, "Image deleted successfully", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.e("HomeActivity", "Delete failed: ${deleteResponse.error}")
+                            Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Log.e("HomeActivity", "Delete failed: ${response.errorBody()?.string()}")
+                    Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<DeleteResponse>, t: Throwable) {
+                Log.e("HomeActivity", "Delete failed: ${t.message}")
+                Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    showDeleteDialog?.let { imageId ->
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = null },
+            title = { Text("Delete Image") },
+            text = { Text("Are you sure you want to permanently delete this image?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        deleteImage(imageId)
+                        showDeleteDialog = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Delete", color = Color.White)
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                WardrobeButton()
-
-                // Profile Button (Placeholder)
-                IconButton(
-                    onClick = { /* Handle Profile Button Click */ },
-                    modifier = Modifier
-                        .size(60.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile), // Replace with appropriate drawable resource
-                        contentDescription = "Profile",
-                        modifier = Modifier.fillMaxSize()
+                Text(
+                    text = "Gender",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (isMale) "Men" else "Women",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Switch(
+                        checked = isMale,
+                        onCheckedChange = { isMale = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
                 }
+            }
+        }
 
-                // Upload Button
-                IconButton(
-                    onClick = onGalleryClick,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.upload), // Replace with appropriate drawable resource
-                        contentDescription = "Upload Photo",
-                        modifier = Modifier.fillMaxSize()
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Outfits Calendar",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Today, ${getCurrentDate()}",
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
+            }
+        }
 
-                // Camera Button
-                IconButton(
-                    onClick = onCameraClick,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.camera), // Replace with appropriate drawable resource
-                        contentDescription = "Capture Photo",
-                        modifier = Modifier.fillMaxSize()
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "My Outfits",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Row {
+                    IconButton(onClick = onWardrobeClick) {
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_menu_add),
+                            contentDescription = "Add Outfit",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = onCameraClick) {
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_menu_camera),
+                            contentDescription = "Take Photo",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = onGalleryClick) {
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                            contentDescription = "Upload Photo",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = onMarketplaceClick) {
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_menu_slideshow),
+                            contentDescription = "Marketplace",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+                items(clothingImages.size) { index ->
+                    val (path, prediction) = clothingImages[index]
+                    OutfitCard(
+                        imageSource = path,
+                        prediction = prediction,
+                        onDeleteClick = { showDeleteDialog = path }
                     )
+                }
+                if (clothingImages.isEmpty()) {
+                    item {
+                        OutfitCard(
+                            imageSource = "No Items",
+                            prediction = "Unknown",
+                            onDeleteClick = {}
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Recommendations",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = { onRecommendationClick("Casual", if (isMale) "Men" else "Women") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Casual", color = Color.White)
+                }
+                Button(
+                    onClick = { onRecommendationClick("Formal", if (isMale) "Women" else "Men") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Formal", color = Color.White)
+                }
+                Button(
+                    onClick = { onRecommendationClick("Sporty", if (isMale) "Men" else "Women") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Sporty", color = Color.White)
                 }
             }
         }
@@ -379,78 +521,104 @@ fun HomeScreen(
 }
 
 @Composable
-fun StyleButton(styleName: String, styleTag: String, onStyleSelected: (String) -> Unit) {
-    Button(
-        onClick = { onStyleSelected(styleTag) },
+fun OutfitCard(
+    imageSource: String,
+    prediction: String,
+    onDeleteClick: (String) -> Unit
+) {
+    Card(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBCFF5E))
+            .width(120.dp)
+            .height(150.dp)
+            .clip(RoundedCornerShape(12.dp)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Text(text = styleName, color = Color.Black)
-    }
-}
-
-
-@Composable
-fun MarketingCard(imageResId: Int, text: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .background(Color(0xFF282B30), shape = RoundedCornerShape(8.dp)), // Set dark background color and rounded corners
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = imageResId),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth() // Image takes full width of the card
-                .height(200.dp) // Fixed height for consistency
-                .clip(RoundedCornerShape(8.dp)), // Apply rounded corners to the image
-            contentScale = ContentScale.Crop // Crop the image to fit
-        )
-        Spacer(modifier = Modifier.height(8.dp)) // Add space between image and text
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp), // Ensure text is readable
-            color = Color.White, // White text for contrast
-            modifier = Modifier.padding(horizontal = 8.dp) // Add horizontal padding
-        )
-        Spacer(modifier = Modifier.height(8.dp)) // Add space between text and button
-        Button(
-            onClick = {}, // No action for now
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth() // Button spans full width
-                .height(48.dp), // Set height for button
-            shape = RoundedCornerShape(8.dp), // Rounded button corners
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBCFF5E)) // Set button color to #BCFF5E
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(text = "Learn More", color = Color.Black) // Button text in white for contrast
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
+                val context = LocalContext.current
+                val imageUrl = "http://10.0.2.2:4000/api/images/$imageSource"
+                val token = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+                    .getString("jwt_token", null)
+                val painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(context)
+                        .data(imageUrl)
+                        .error(android.R.drawable.ic_menu_gallery)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .apply {
+                            if (token != null) {
+                                addHeader("Authorization", "Bearer $token")
+                            }
+                        }
+                        .listener(
+                            onError = { _, result ->
+                                Log.e("OutfitCard", "Failed to load image $imageUrl: ${result.throwable.message}")
+                            },
+                            onSuccess = { _, _ ->
+                                Log.d("OutfitCard", "Successfully loaded image $imageUrl")
+                            }
+                        )
+                        .build()
+                )
+                Image(
+                    painter = painter,
+                    contentDescription = prediction,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = prediction,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            IconButton(
+                onClick = { onDeleteClick(imageSource) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .size(24.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
+                    contentDescription = "Delete Image",
+                    tint = Color.Red
+                )
+            }
         }
     }
 }
 
-// Move WardrobeButton outside of HomeScreen for organization
-@Composable
-fun WardrobeButton() {
-    val context = LocalContext.current // Get the context in a Composable
+fun getCurrentDate(): String {
+    val calendar = Calendar.getInstance()
+    val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+    return "Today, $day $month"
+}
 
-    IconButton(
-        onClick = {
-            val intent = Intent(context, WardrobeActivity::class.java)
-            context.startActivity(intent)
-        },
-        modifier = Modifier
-            .size(60.dp)
-            .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.wardrobe), // Replace with appropriate drawable resource
-            contentDescription = "Wardrobe",
-            modifier = Modifier.fillMaxSize()
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    OutfitAura2Theme {
+        HomeScreen(
+            onWardrobeClick = {},
+            onCameraClick = {},
+            onGalleryClick = {},
+            clothingImages = listOf(Pair("path", "t-shirt"), Pair("path2", "jeans")),
+            onRecommendationClick = { _, _ -> },
+            onDeleteImage = {},
+            onMarketplaceClick = {}
         )
     }
 }

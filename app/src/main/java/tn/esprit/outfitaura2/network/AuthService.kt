@@ -3,7 +3,9 @@ package tn.esprit.outfitaura2.network
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Path
 import tn.esprit.outfitaura2.models.ForgotPasswordRequest
+import tn.esprit.outfitaura2.models.ForgotPasswordResponse
 import tn.esprit.outfitaura2.models.LoginRequest
 import tn.esprit.outfitaura2.models.LoginResponse
 import tn.esprit.outfitaura2.models.ResetPasswordRequest
@@ -12,21 +14,19 @@ import tn.esprit.outfitaura2.models.SignUpRequest
 import tn.esprit.outfitaura2.models.SignUpResponse
 
 data class User(
-   // val id: Int,
     val email: String
 )
 
 interface AuthService {
-    @POST("user/login")
+    @POST("api/user/login")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
 
-    @POST("user/register")
+    @POST("api/user/register")
     fun register(@Body request: SignUpRequest): Call<SignUpResponse>
 
+    @POST("api/user/forgot-password")
+    fun forgotPassword(@Body request: ForgotPasswordRequest): Call<ForgotPasswordResponse>
 
-    @POST("user/forgot-password")
-    fun forgotPassword(@Body email: String): Call<String>
-
-    @POST("user/reset-password")
-    fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
+    @POST("api/user/reset-password/{token}")
+   fun resetPassword(@Path("token") token: String, @Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
 }

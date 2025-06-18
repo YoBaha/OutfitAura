@@ -1,5 +1,4 @@
 package tn.esprit.outfitaura2.viewmodels
-
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import org.tensorflow.lite.Interpreter
@@ -33,25 +32,46 @@ class ClothingClassifier(modelPath: String, assetManager: AssetManager) {
         }
     }
 
-    fun classify(image: Bitmap): Int {
+    fun classify(image: Bitmap): String {
         // Preprocess the image
         val inputBuffer = preprocessImage(image)
 
-        // Define the output buffer for the model's predictions
+        // Define the output buffer for the model's predictions (16 classes)
         val outputBuffer = TensorBuffer.createFixedSize(
-            intArrayOf(1, 11), // Adjust dimensions to match model output
+            intArrayOf(1, 16), // Match the number of output classes
             org.tensorflow.lite.DataType.FLOAT32
         )
 
         // Run the model inference
         interpreter.run(inputBuffer, outputBuffer.buffer)
 
-        // Find the index of the highest probability (classification result)
-        return outputBuffer.floatArray.indices.maxByOrNull { outputBuffer.floatArray[it] } ?: -1
+        // Find the index of the highest probability
+        val maxIndex = outputBuffer.floatArray.indices.maxByOrNull { outputBuffer.floatArray[it] } ?: -1
+
+        // Map index to label based on your 16 classes
+        return when (maxIndex) {
+            0 -> "shirt"
+            1 -> "shorts"
+            2 -> "shoes"
+            3 -> "t-shirt"
+            4 -> "pants"
+            5 -> "sneakers"
+            6 -> "athleisure-women"
+            7 -> "athleisure-men"
+            8 -> "suit-men"
+            9 -> "suit-women"
+            10 -> "skirt"
+            11 -> "outwear"
+            12 -> "longsleeve"
+            13 -> "hat"
+            14 -> "dress"
+            15 -> "hoodie"
+            else -> "Unknown"
+        }
     }
 
     private fun preprocessImage(bitmap: Bitmap): ByteBuffer {
-        val inputSize = 224 // Standard input size for most TFLite models
+        val inputSize = 224 // Match Teachable Machine's typical input size
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize, true)
 
         // Create a ByteBuffer for normalized pixel data

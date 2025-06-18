@@ -1,5 +1,6 @@
 package tn.esprit.outfitaura2
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -19,14 +20,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import tn.esprit.outfitaura2.models.SignUpRequest
 import tn.esprit.outfitaura2.models.SignUpResponse
 import tn.esprit.outfitaura2.network.ApiClient
+import tn.esprit.outfitaura2.network.OnUnauthorizedCallback
+import tn.esprit.outfitaura2.ui.theme.OutfitAura2Theme
 
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,16 +68,19 @@ class SignUpActivity : ComponentActivity() {
         }
 
         val signUpRequest = SignUpRequest(email, password)
-        ApiClient.authService.register(signUpRequest).enqueue(object : Callback<SignUpResponse> {
+        val call = ApiClient.getAuthService(this).register(signUpRequest)
+        ApiClient.tagCall(call, this, OnUnauthorizedCallback { ctx: Context ->
+            ctx.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+            showToast("Session issue. Please try again.")
+        }).enqueue(object : Callback<SignUpResponse> {
             override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
                 if (response.isSuccessful) {
                     val signUpResponse = response.body()
                     if (signUpResponse?.success == true) {
-                        showToast("Sign Up Successful")
-                        resetFields()
+                        showToast(signUpResponse.message ?: "Sign Up Successful")
                         onComplete(true)
                     } else {
-                        showToast("Email already registered")
+                        showToast(signUpResponse?.error ?: "Email already registered")
                         onComplete(false)
                     }
                 } else {
@@ -90,10 +96,6 @@ class SignUpActivity : ComponentActivity() {
         })
     }
 
-    private fun resetFields() {
-        // The fields are managed via state in the Compose UI, so this is unnecessary here.
-    }
-
     private fun navigateToLoginActivity() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
@@ -103,129 +105,136 @@ class SignUpActivity : ComponentActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+}
 
-    @Composable
-    fun SignUpUI(
-        email: String,
-        onEmailChange: (String) -> Unit,
-        password: String,
-        onPasswordChange: (String) -> Unit,
-        isLoading: Boolean,
-        onSignUpClick: (String, String) -> Unit,
-        showToast: (String) -> Unit,
-        navigateToLogin: () -> Unit
+@Composable
+fun SignUpUI(
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    isLoading: Boolean,
+    onSignUpClick: (String, String) -> Unit,
+    showToast: (String) -> Unit,
+    navigateToLogin: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
     ) {
-        Box(
+        Image(
+            painter = painterResource(id = R.drawable.bg3),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bg3),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                painter = painterResource(id = R.drawable.a),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(250.dp)
             )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.a),
-                    contentDescription = "App Logo",
-                    modifier = Modifier.size(250.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Sign Up",
+                style = MaterialTheme.typography.headlineLarge,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = { Text("Email", color = Color.White) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Color.White
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Sign Up",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                label = { Text("Password", color = Color.White) },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Color.White
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = onEmailChange,
-                    label = { Text("Email", color = Color.White) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        cursorColor = Color.White
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = onPasswordChange,
-                    label = { Text("Password", color = Color.White) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        cursorColor = Color.White
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-                        if (!isLoading) {
-                            onSignUpClick(email, password)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.Black
-                        )
-                    } else {
-                        Text("Sign Up")
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    if (!isLoading) {
+                        onSignUpClick(email, password)
                     }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = { navigateToLogin() },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                ),
+                enabled = !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.Black
                     )
-                ) {
-                    Text("Already have an account? Log In")
+                } else {
+                    Text("Sign Up")
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { navigateToLogin() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text("Already have an account? Log In")
+            }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignUpUIPreview() {
+    OutfitAura2Theme {
+        SignUpUI(
+            email = "",
+            onEmailChange = {},
+            password = "",
+            onPasswordChange = {},
+            isLoading = false,
+            onSignUpClick = { _, _ -> },
+            showToast = {},
+            navigateToLogin = {}
+        )
     }
 }

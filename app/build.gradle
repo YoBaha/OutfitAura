@@ -46,16 +46,18 @@ dependencies {
     implementation libs.androidx.ui.graphics
     implementation libs.androidx.ui.tooling.preview
     implementation libs.androidx.material3
-
+    implementation libs.androidx.localbroadcastmanager
     implementation libs.play.services.auth
 
     implementation libs.tensorflow.lite
     implementation libs.tensorflow.lite.support
 
 
+
     implementation libs.androidx.material3.v121
     implementation libs.ui
     implementation libs.androidx.foundation.v161
+    implementation(libs.coil.compose)
 
     implementation libs.androidx.room.runtime
     annotationProcessor libs.androidx.room.compiler

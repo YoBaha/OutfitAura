@@ -1,7 +1,7 @@
 package tn.esprit.outfitaura2.models
 
-data class SignUpResponse(
+data class ProductResponse(
     val success: Boolean,
-    val message: String?,
+    val products: List<Product>,
     val error: String?
 )
